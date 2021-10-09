@@ -1,0 +1,85 @@
+import { RepositoryBase, ServiceBase } from '@valluri/saradhi-library';
+import { Action, Event, Method, Service } from 'moleculer-decorators';
+import { Context } from 'moleculer';
+import { TestDataSeeder } from '@Repositories/data-seeder-test';
+import { ConfigDataSeeder } from '@Repositories/data-seeder-config';
+
+@Service({
+	name: 'productStartup',
+	version: 1,
+})
+export default class StartupService extends ServiceBase {
+	private static DATA_SEEDING: string = 'isProductDataSeeding';
+
+	public async started() {
+		console.log(`Connecting to DB at ${process.env.TYPEORM_HOST}:${process.env.TYPEORM_PORT}`);
+
+		this.setEntitiesMethod();
+		await RepositoryBase.getConnection();
+
+		this.broker.waitForServices(['v1.systemSetting']).then(async () => {
+			await this.triggerSeedMethod();
+		});
+	}
+
+	@Action({
+		security: {
+			noChecks: true,
+		},
+	})
+	public async triggerSeed(ctx: Context) {
+		this.triggerSeedMethod();
+	}
+
+	@Action({
+		security: {
+			noChecks: true,
+		},
+	})
+	public getServerTime(ctx: Context): Date {
+		return new Date();
+	}
+
+	@Event({
+		name: '$broker.stopped',
+	})
+	private async stop() {
+		await RepositoryBase.closeConnection();
+	}
+
+	@Method
+	private async triggerSeedMethod() {
+		try {
+			// *check if seeding started
+			let setting: string | undefined | boolean = await this.broker.call('v1.systemSetting.get', { name: StartupService.DATA_SEEDING });
+			setting = setting && +setting ? true : false;
+
+			if (setting) {
+				this.broker.logger.info('test data seeding already started !');
+				return;
+			}
+
+			// *test data seed flag set to true
+			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '1' });
+
+			this.broker.logger.info('seed started');
+
+			const ctx: Context = this.broker.ContextFactory.create(this.broker);
+			await TestDataSeeder.seed(ctx);
+			await ConfigDataSeeder.seed(ctx);
+
+			// *test data seed flag reset to false for next time container start
+			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '0' });
+			this.broker.logger.info('seed completed');
+		} catch (err) {
+			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '0' });
+		}
+	}
+
+	@Method
+	private setEntitiesMethod() {
+		RepositoryBase.entities = [];
+	}
+}
+
+module.exports = StartupService;

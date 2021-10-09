@@ -1,0 +1,89 @@
+# # This file is a template, and might need editing before it works on your project.
+# # Official framework image. Look for the different tagged releases at:
+# # https://hub.docker.com/r/library/node/tags/
+# image: node:latest
+
+# # Pick zero or more services to be used on all builds.
+# # Only needed when using a docker container to run your tests in.
+# # Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-a-service
+# # services:
+# #   - mysql:latest
+# #   - redis:latest
+# #   - postgres:latest
+
+# # This folder is cached between builds
+# # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+# cache:
+#   paths:
+#     - node_modules/
+
+# stages:
+#   - build
+#   # - test
+#   - staging
+#   - deploy
+#   - az-deploy
+#   - az-deploy-2
+
+# build:
+#   stage: build
+#   script:
+#     - npm install
+#     - npm run build
+
+# # TODO Dependencies of all stages should include test
+# # test:
+# #   stage: test
+# #   image: docker
+# #   services:
+# #     - docker:dind
+# #   dependencies:
+# #     - build
+# #   before_script:
+# #     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+# #   script:
+# #     - docker info
+# #     - apk update
+# #     - apk upgrade
+# #     - apk add nodejs
+# #     - apk add npm
+# #     - apk add docker-compose
+# #     - echo "$TEST_ENV_LOCAL" > .env.local
+# #     - ENVIRONMENT=test docker-compose up --build -d api && npm i && npm test connections
+
+# staging:
+#   stage: staging
+#   only:
+#     - master
+#   dependencies:
+#     # - test
+#     - build
+#   before_script:
+#     - echo "Deploying"
+#     - mkdir sshkey
+#     - echo "$SSH_KEY_APP" > ./sshkey/app-key.pem
+#     - chmod 600 ./sshkey/app-key.pem
+#     - mkdir -p ~/.ssh
+#     - ssh-keyscan $DEPLOYMENT_SERVER >> ~/.ssh/known_hosts
+#   script:
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ec2-user@$DEPLOYMENT_SERVER "cd sk-saradhi-api; git reset --hard && git pull origin master && ENVIRONMENT=test docker-compose up --build -d api api2 swagger portainer"
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ec2-user@$DEPLOYMENT_SERVER "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 705804239638.dkr.ecr.ap-south-1.amazonaws.com"
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ec2-user@$DEPLOYMENT_SERVER "docker tag api:latest 705804239638.dkr.ecr.ap-south-1.amazonaws.com/test-api-server:latest"
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ec2-user@$DEPLOYMENT_SERVER "aws ecr batch-delete-image --repository-name test-api-server --image-ids imageTag=latest"
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ec2-user@$DEPLOYMENT_SERVER "docker push 705804239638.dkr.ecr.ap-south-1.amazonaws.com/test-api-server:latest"
+# deploy:
+#   stage: deploy
+#   only:
+#     - production
+#   dependencies:
+#     # - test
+#     - build
+#   before_script:
+#     - echo "Deploying"
+#     - mkdir sshkey
+#     - echo "$SSH_KEY_PROD" > ./sshkey/app-key.pem
+#     - chmod 600 ./sshkey/app-key.pem
+#     - mkdir -p ~/.ssh
+#     - ssh-keyscan $PRODUCTION_SERVER >> ~/.ssh/known_hosts
+#   script:
+#     - ssh -v -o StrictHostKeyChecking=no -i ./sshkey/app-key.pem ubuntu@$PRODUCTION_SERVER "cd sk-saradhi-api; git reset --hard && git pull && git checkout production && sudo ENVIRONMENT=production docker-compose up --build -d api api2 portainer"

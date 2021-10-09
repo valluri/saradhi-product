@@ -1,0 +1,193 @@
+version: '3.2'
+
+services:
+  api:
+    build:
+      context: .
+    image: api
+    container_name: api-primary
+    env_file:
+      - .env
+      - .env.local
+      - .env.${ENVIRONMENT}
+    depends_on:
+      - redis
+      - rabbitmq
+      - logstash
+      - kibana
+      - jaeger
+    environment:
+      PORT: 4001
+      CONTAINER_NAME: 'api-primary'
+    ports:
+      - '4001:4001'
+
+  api2:
+    image: api
+    container_name: api-secondary
+    env_file:
+      - .env
+      - .env.local
+      - .env.${ENVIRONMENT}
+    depends_on:
+      - api
+    environment:
+      PORT: 4002
+      CONTAINER_NAME: 'api-secondary'
+    ports:
+      - '4002:4002'
+
+  swagger:
+    build:
+      context: ./
+      dockerfile: DockerfileSwagger
+    image: swagger
+    container_name: swagger
+    env_file:
+      - .env
+      - .env.local
+      - .env.${ENVIRONMENT}
+    depends_on:
+      - api
+    ports:
+      - '3838:3838'
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - '6380:6379'
+    restart: always
+
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile-rmq
+    container_name: rabbit-mq
+    env_file:
+      - .env
+      - .env.local
+    ports:
+      - '4369:4369'
+      - '5671:5671'
+      - '5673:5672'
+      - '15673:15672'
+      - '25672:25672'
+    volumes:
+      - type: volume
+        source: rabbitmq
+        target: /var/lib/rabbitmq
+    restart: always
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one
+    ports:
+      - '5775:5775/udp'
+      - '5778:5778'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '14250:14250'
+      - '14268:14268'
+      - '16686:16686'
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - type: bind
+        source: ./elk_stack/elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    environment:
+      ES_JAVA_OPTS: '-Xmx512m -Xms512m'
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    restart: always
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - type: bind
+        source: ./elk_stack/logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./elk_stack/logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - '5000:5000/tcp'
+      - '5000:5000/udp'
+      - '9600:9600'
+    expose:
+      - '5000'
+    environment:
+      LS_JAVA_OPTS: '-Xmx512m -Xms512m'
+    depends_on:
+      - elasticsearch
+    restart: always
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    env_file:
+      - .env
+      - .env.local
+    volumes:
+      - type: bind
+        source: ./elk_stack/kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - '5601:5601'
+    depends_on:
+      - elasticsearch
+    restart: always
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    command: --admin-password '$$2y$$05$$YjfmaRNVFYBddJ2r6Gp3FeeSgxTscBV0sFUiwyp7Bgf5t3nkdMg5W'
+    restart: always
+    ports:
+      - 9000:9000
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    # volumes:
+    #   - ./src/database/:/docker-entrypoint-initdb.d/
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: dm
+    volumes:
+      - type: volume
+        source: postgres
+        target: /var/lib/postgresql/data
+
+volumes:
+  portainer_data:
+  elasticsearch:
+  rabbitmq:
+  postgres:

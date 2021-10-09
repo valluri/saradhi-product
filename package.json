@@ -1,0 +1,149 @@
+{
+	"name": "saradhi-core",
+	"version": "1.0.0",
+	"description": "saradhi-core",
+	"repository": {
+		"type": "git",
+		"url": "https://gitlab.com/Valluri/saradhi-core.git"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "cross-env NODE_ENV=dev ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/**/*.service.ts",
+		"dev-no-api": "ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/*.service.ts",
+		"start": "TS_NODE_PROJECT=tsconfig.production.json node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --config dist/moleculer.config.js dist/services",
+		"cli": "pankod-cli add",
+		"test": "cross-env NODE_ENV=e2e jest --coverage --runInBand --detectOpenHandles",
+		"clear-jest": "jest --clearCache",
+		"lint": "eslint -c .eslintrc.js --ext .ts {services,src,test}/**",
+		"format": "eslint -c .eslintrc.js --ext .ts --fix {services,src,test}/**",
+		"dc:up": "docker-compose up --build -d",
+		"dc:down": "docker-compose down",
+		"swagger": "swagger-jsdoc -d swagger/config.js -o swagger/swagger.json services/*.service.ts && node ./swagger/index.js",
+		"typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
+	},
+	"keywords": [
+		"microservices"
+	],
+	"author": "SubK <info@subk.co.in>",
+	"devDependencies": {
+		"@types/async": "^3.2.0",
+		"@types/bluebird": "^3.5.35",
+		"@types/circular-json": "^0.4.0",
+		"@types/dotenv": "^6.1.1",
+		"@types/jaeger-client": "^3.18.0",
+		"@types/jest": "^27.0.1",
+		"@types/json2csv": "^5.0.3",
+		"@types/jsonwebtoken": "^8.5.5",
+		"@types/lodash": "^4.14.172",
+		"@types/node": "^16.6.2",
+		"@types/randomstring": "^1.1.7",
+		"@types/speakeasy": "^2.0.6",
+		"@types/supertest": "^2.0.11",
+		"@types/uuid": "^8.3.1",
+		"@typescript-eslint/eslint-plugin": "^4.29.2",
+		"@typescript-eslint/parser": "^4.29.2",
+		"cross-env": "^7.0.3",
+		"eslint": "^7.32.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^3.4.0",
+		"jest": "^27.0.6",
+		"jest-cli": "^27.0.6",
+		"jest-extended": "^0.11.5",
+		"jest-html-reporter": "^3.4.1",
+		"lodash": "^4.17.21",
+		"moleculer-repl": "^0.6.4",
+		"prettier": "^2.3.0",
+		"supertest": "^6.1.6",
+		"ts-jest": "^27.0.5",
+		"ts-node": "^10.2.1",
+		"ts-node-dev": "^1.1.8",
+		"typescript": "^4.3.5"
+	},
+	"dependencies": {
+		"@valluri/saradhi-library": "^0.1.21",
+		"async": "^3.2.1",
+		"axios": "^0.21.1",
+		"class-transformer": "^0.4.0",
+		"cors": "^2.8.5",
+		"cron-parser": "^3.5.0",
+		"csv": "^5.5.0",
+		"dateformat": "^4.5.1",
+		"dotenv": "^10.0.0",
+		"dotenv-flow": "^3.2.0",
+		"ejs": "^3.1.6",
+		"fastest-validator": "^1.11.1",
+		"flatted": "^3.2.2",
+		"formidable": "^1.2.2",
+		"ioredis": "^4.27.9",
+		"jaeger-client": "^3.18.1",
+		"json2csv": "^5.0.6",
+		"jsonwebtoken": "^8.5.1",
+		"logform": "^2.2.0",
+		"marked": "^3.0.0",
+		"moleculer": "^0.14.16",
+		"moleculer-decorators": "^1.3.0",
+		"moment": "^2.29.1",
+		"pg": "^8.7.1",
+		"pg-hstore": "^2.3.3",
+		"randomstring": "^1.2.1",
+		"reflect-metadata": "^0.1.13",
+		"request": "^2.88.2",
+		"request-promise": "^4.2.6",
+		"speakeasy": "^2.0.0",
+		"tsconfig-paths": "^3.10.1",
+		"typeorm": "^0.2.37",
+		"typeorm-encrypted": "^0.5.6",
+		"uuid": "^8.3.2",
+		"wait-for-event": "^2.0.1",
+		"winston": "^3.3.3"
+	},
+	"engines": {
+		"node": ">= 8.x.x"
+	},
+	"jest": {
+		"testTimeout": 50000,
+		"reporters": [
+			"default",
+			[
+				"./node_modules/jest-html-reporter",
+				{
+					"pageTitle": "Test Report",
+					"outputPath": "<rootDir>/coverage/testreport.html"
+				}
+			]
+		],
+		"coverageDirectory": "<rootDir>/coverage",
+		"testEnvironment": "node",
+		"moduleFileExtensions": [
+			"ts",
+			"js"
+		],
+		"moduleNameMapper": {
+			"^public/(.*)$": "<rootDir>/public/$1",
+			"^@(Test)(.*)$": "<rootDir>/test/$2",
+			"@Entities/Connection": "<rootDir>/test/Config/Connection",
+			"@Entities/(.*)": "<rootDir>/src/entities/$1",
+			"@Repositories/(.*)": "<rootDir>/src/repositories/$1",
+			"@ServiceHelpers/(.*)": "<rootDir>/src/service-helpers/$1",
+			"@MicroServices/(.*)": "<rootDir>/services/$1",
+			"^@([A-Z].*)$": "<rootDir>/src/$1"
+		},
+		"transform": {
+			"^.+\\.(ts)$": "ts-jest"
+		},
+		"testMatch": [
+			"<rootDir>/test/*.spec.(ts)"
+		],
+		"globals": {
+			"ts-jest": {
+				"tsconfig": "<rootDir>/tsconfig.json"
+			}
+		},
+		"setupFiles": [
+			"dotenv-flow/config"
+		],
+		"setupFilesAfterEnv": [
+			"<rootDir>/test/helpers/customMatchers.ts"
+		]
+	}
+}

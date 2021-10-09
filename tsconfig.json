@@ -1,0 +1,35 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"esModuleInterop": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"strict": true,
+		"module": "commonjs",
+		"pretty": true,
+		"types": ["jest", "node"],
+		"outDir": "dist",
+		"sourceMap": true,
+		"target": "es6",
+		"allowJs": true,
+		"baseUrl": ".",
+		"paths": {
+			"@MicroServices/*": ["services/*"],
+			"@MicroServices": ["services"],
+			"@Interfaces/*": ["src/interfaces/*"],
+			"@Interfaces": ["src/interfaces"],
+			"@Repositories/*": ["src/repositories/*"],
+			"@Repositories": ["src/repositories"],
+			"@ServiceHelpers/*": ["src/service-helpers/*"],
+			"@ServiceHelpers": ["src/service-helpers"],
+			"@Entities/*": ["src/entities/*"],
+			"@Entities": ["src/entities"],
+			"@Test/*": ["test/*"],
+			"@Test": ["test"]
+		}
+	},
+	"exclude": ["node_modules"],
+	"include": ["./src/**/*.ts", "./services/**/*.ts", "./test/**/*.ts"]
+}

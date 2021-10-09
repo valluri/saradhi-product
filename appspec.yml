@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/sk-saradhi-api
+permissions:
+  - object: /home/ubuntu/sk-saradhi-api/scripts
+    pattern: "*"
+    owner: ubuntu
+    mode: 755
+    type:
+      - file
+hooks:
+  BeforeInstall:
+    - location: scripts/remove_before_install.sh
+      timeout: 3600
+  AfterInstall:
+    - location: scripts/install_dependencies.sh
+      timeout: 3600
+  ApplicationStop:
+    - location: scripts/stop_server1.sh
+      timeout: 3600
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      #runas: root

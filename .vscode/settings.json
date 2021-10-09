@@ -1,0 +1,34 @@
+{
+	"workbench.colorTheme": "Visual Studio Dark",
+	"git.confirmSync": false,
+	"git.autofetch": true,
+	"editor.tabSize": 2,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.formatOnType": true,
+	"files.autoSave": "off",
+	"tslint.alwaysShowRuleFailuresAsWarnings": true,
+	"tslint.alwaysShowStatus": true,
+	"tslint.autoFixOnSave": true,
+	"tslint.run": "onSave",
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"files.insertFinalNewline": true,
+	"files.trimFinalNewlines": true,
+	"files.trimTrailingWhitespace": true,
+	"workbench.editor.enablePreview": false,
+	"diffEditor.ignoreTrimWhitespace": false,
+	"atlascode.jira.workingSite": {
+		"baseUrlSuffix": "atlassian.net"
+	},
+	"yaml.schemas": {
+		"file:///c%3A/Users/Valluri/.vscode/extensions/atlassian.atlascode-2.1.5/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+	},
+	"extensions.ignoreRecommendations": false,
+	"workbench.startupEditor": "newUntitledFile",
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"todo-tree.tree.showScanModeButton": false,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"versionlens.suggestions.showOnStartup": true
+}
