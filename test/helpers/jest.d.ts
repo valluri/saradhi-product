@@ -14,4 +14,8 @@ declare namespace jest {
 	interface Matchers<R> {
 		toBeArrayOfTypeOfLength<T>(a: T, b: number): R;
 	}
+
+	interface Matchers<R> {
+		toBeUuid(): R;
+	}
 }

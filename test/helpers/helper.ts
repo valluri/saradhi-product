@@ -1,10 +1,12 @@
 import Moleculer, { ServiceBroker } from 'moleculer';
 import randomstring from 'randomstring';
 import StartupService from '@MicroServices/startup.service';
+import { OtpSendToType } from '@valluri/saradhi-library';
 
 export default class TestHelper {
 	static userId: string = '';
 	static jwt: string = '';
+	static USER_MOBILE: string = '1234567890';
 
 	static getBroker(services: Moleculer.ServiceSchema[] = []): ServiceBroker {
 		const broker = new ServiceBroker({
@@ -37,13 +39,16 @@ export default class TestHelper {
 		await broker.stop();
 	}
 
-	static async getServerJwt(broker: ServiceBroker, userId: number): Promise<{}> {
-		const jwt: string = await broker.call('v1.auth.createServerJwt', { userId });
-		return { meta: { jwt } };
-	}
-
 	static async getOptions(broker: ServiceBroker): Promise<{}> {
-		return { meta: { jwt: '' } };
+		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.Mobile });
+		const returnValue: { jwt: string } = await broker.call('v1.login.loginUsingPhoneNumber', {
+			phoneNumber: TestHelper.USER_MOBILE,
+			otp: '123456',
+			platform: 'web',
+			killExistingSession: true,
+		});
+
+		return { meta: { jwt: returnValue.jwt } };
 	}
 
 	static async sleep(ms: number) {
