@@ -44,7 +44,7 @@ export default class LoanRequestService extends ServiceBase {
 			firstName: { type: 'string', min: 3, max: 200 },
 			lastName: { type: 'string', min: 3, max: 200 },
 			gender: { type: 'string' },
-			mobile: { type: 'string' },
+			mobile: { type: 'string', optional: true },
 			email: { type: 'email', optional: true },
 			loanType: { type: 'string', min: 2, max: 200 },
 			loanAmount: { type: 'string', min: 2, max: 200 },

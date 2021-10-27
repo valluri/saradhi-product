@@ -1,10 +1,10 @@
 {
-	"name": "saradhi-core",
+	"name": "saradhi-product",
 	"version": "1.0.0",
-	"description": "saradhi-core",
+	"description": "saradhi-product",
 	"repository": {
 		"type": "git",
-		"url": "https://gitlab.com/Valluri/saradhi-core.git"
+		"url": "https://gitlab.com/Valluri/saradhi-product.git"
 	},
 	"scripts": {
 		"build": "tsc",
