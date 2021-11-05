@@ -41,12 +41,13 @@ export default class TestHelper {
 
 	static async getOptions(broker: ServiceBroker): Promise<{}> {
 		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.Mobile });
-		const returnValue: { jwt: string } = await broker.call('v1.login.loginUsingPhoneNumber', {
+		const returnValue: { jwt: string; userDetails: any } = await broker.call('v1.login.loginUsingPhoneNumber', {
 			phoneNumber: TestHelper.USER_MOBILE,
 			otp: '123456',
 			platform: 'web',
 			killExistingSession: true,
 		});
+		TestHelper.userId = returnValue.userDetails.id!;
 
 		return { meta: { jwt: returnValue.jwt } };
 	}
