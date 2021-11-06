@@ -29,5 +29,4 @@ test('loan request create', async () => {
 	const returnValue: LoanRequest = await broker.call('v1.loanRequest.create', p, opts);
 
 	expect(returnValue.id).toBeUuid();
-	expect(returnValue.f)
 });
