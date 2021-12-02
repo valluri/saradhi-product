@@ -1,6 +1,5 @@
-import { ProductCategory } from '@valluri/saradhi-library';
+import { ProductCategory, NameCodeBaseModel } from '@valluri/saradhi-library';
 import { Entity, Column } from 'typeorm';
-import { NameCodeBaseModel } from '@valluri/saradhi-library';
 
 @Entity({ name: 'products' })
 export class Product extends NameCodeBaseModel {

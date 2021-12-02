@@ -3,7 +3,7 @@ import { Context } from 'moleculer';
 import { ProductPartner } from '@Entities/product-partner';
 import { Partner } from '@Entities/partner';
 import { ProductPartnerConfig } from '@Entities/product-partner-config';
-import { ProductPartnerConfigKeys } from '@ServiceHelpers/product-config-keys';
+import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
 import { Product } from '@Entities/product';
 
 export class TestDataSeeder extends RepositoryBase {
@@ -15,26 +15,6 @@ export class TestDataSeeder extends RepositoryBase {
 		await TestDataSeeder.seedProductPartners(ctx);
 
 		ctx.broker.logger.info('test data seed done');
-	}
-
-	private static async seedProducts(ctx: Context) {
-		ctx.broker.logger.info('partner seed started');
-		await TestDataSeeder.seedProduct(ctx, '2 Wheeler', '2W', ProductCategory.LoanLead);
-		await TestDataSeeder.seedProduct(ctx, '4 Wheeler', '4W', ProductCategory.LoanLead);
-		await TestDataSeeder.seedProduct(ctx, 'Housing Loan', 'HL', ProductCategory.LoanLead);
-		await TestDataSeeder.seedProduct(ctx, 'Gola Loan', 'GL', ProductCategory.LoanLead);
-
-		ctx.broker.logger.info('partner seed done');
-	}
-
-	private static async seedProduct(ctx: Context, name: string, code: string, productCategory: ProductCategory) {
-		const query = { where: { code, deleted: false } };
-		const p = new Product();
-		p.name = name;
-		p.code = code;
-		p.category = productCategory;
-
-		await DataSeederHelper.seedItem<Product>(Product, query, p);
 	}
 
 	private static async seedPartners(ctx: Context) {
@@ -73,12 +53,12 @@ export class TestDataSeeder extends RepositoryBase {
 		p = await DataSeederHelper.seedItem<ProductPartner>(ProductPartner, query, p);
 
 		const minAmount: number = Math.floor(Math.random() * 100);
-		await TestDataSeeder.seedPartnerProductConfig(ctx, p.id!, ProductPartnerConfigKeys.LoanLead.CreditCheckRequired, false);
-		await TestDataSeeder.seedPartnerProductConfig(ctx, p.id!, ProductPartnerConfigKeys.LoanLead.LoanAmountMin, minAmount);
+		await TestDataSeeder.seedPartnerProductConfig(ctx, p.id!, LendingProductConfigKeys.LendingProductConfig.CbCheckRequired, false);
+		await TestDataSeeder.seedPartnerProductConfig(ctx, p.id!, LendingProductConfigKeys.LendingProductConfig.LoanAmountMin, minAmount);
 		await TestDataSeeder.seedPartnerProductConfig(
 			ctx,
 			p.id!,
-			ProductPartnerConfigKeys.LoanLead.LoanAmountMax,
+			LendingProductConfigKeys.LendingProductConfig.LoanAmountMax,
 			minAmount + Math.floor(Math.random() * 100),
 		);
 	}

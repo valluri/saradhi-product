@@ -3,6 +3,12 @@ import { Action, Event, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { TestDataSeeder } from '@Repositories/data-seeder-test';
 import { ConfigDataSeeder } from '@Repositories/data-seeder-config';
+import { Partner } from '@Entities/partner';
+import { PartnerContact } from '@Entities/partner-contact';
+import { Product } from '@Entities/product';
+import { ProductConfig } from '@Entities/product-config';
+import { ProductPartner } from '@Entities/product-partner';
+import { ProductPartnerConfig } from '@Entities/product-partner-config';
 
 @Service({
 	name: 'productStartup',
@@ -78,7 +84,7 @@ export default class StartupService extends ServiceBase {
 
 	@Method
 	private setEntitiesMethod() {
-		RepositoryBase.entities = [];
+		RepositoryBase.entities = [Partner, PartnerContact, Product, ProductConfig, ProductPartner, ProductPartnerConfig];
 	}
 }
 

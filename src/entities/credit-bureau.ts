@@ -97,14 +97,3 @@ export class CbRequest extends BaseModel {
 	})
 	cbType?: CbType;
 }
-
-// public class CrifHighMarkConfig {
-// 	BaseUrl;
-// 	CertificateName;
-// 	MbrId;
-// 	Password;
-// 	S3BucketName;
-// 	SubMbrId;
-// 	UserId;
-
-// }
