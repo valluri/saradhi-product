@@ -106,7 +106,7 @@ export default class ProductService extends ServiceBase {
 			dbItem.id = undefined;
 		}
 
-		return await ProductRepository.saveResource(ctx, ProductDocument, ctx.params);
+		return (await ProductRepository.saveResources(ctx, ProductDocument, ctx.params)) as ProductDocument;
 	}
 
 	@Action({

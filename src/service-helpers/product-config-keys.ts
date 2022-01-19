@@ -19,6 +19,6 @@ export class LendingProductConfigKeys {
 		KycUseManual: 'Kyc_Use_Manual',
 		KycUseElectronic: 'Kyc_Use_Electronic',
 		KycUseVideo: 'Kyc_Use_Video',
-		PropductPitch: 'Product_Pitch',
+		ProductPitch: 'Product_Pitch',
 	};
 }

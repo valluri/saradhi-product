@@ -32,7 +32,7 @@ test('product config e2e', async () => {
 		],
 	};
 
-	const returnValue: ProductConfig[] = await broker.call('v1.product.saveConfig2', p, opts);
+	const returnValue: ProductConfig[] = await broker.call('v1.product.saveConfig', p, opts);
 	expect(returnValue).toBeArrayOfTypeOfLength(ProductConfig, 2);
 
 	expect(returnValue[0].id).toBeUuid();
