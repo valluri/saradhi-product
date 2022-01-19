@@ -5,7 +5,6 @@
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
 		"dbaeumer.vscode-eslint",
-		"CoenraadS.bracket-pair-colorizer-2",
 		"esbenp.prettier-vscode",
 		"mohsen1.prettify-json",
 		"Gruntfuggly.todo-tree",
