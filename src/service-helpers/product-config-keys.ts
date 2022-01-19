@@ -2,6 +2,7 @@ export class LendingProductConfigKeys {
 	public static LendingProductConfig = {
 		AgeMin: 'Age_Min',
 		AgeMax: 'Age_Max',
+		AgeMaxAtApplicationOrMaturity: 'Age_Max_Application_Or_Maturity',
 		CbScoreMin: 'Cb_Score_Min',
 		CbScoreMax: 'Cb_Score_Max',
 		CbCheckRequired: 'Cb_Check_Required',
@@ -18,5 +19,6 @@ export class LendingProductConfigKeys {
 		KycUseManual: 'Kyc_Use_Manual',
 		KycUseElectronic: 'Kyc_Use_Electronic',
 		KycUseVideo: 'Kyc_Use_Video',
+		PropductPitch: 'Product_Pitch',
 	};
 }
