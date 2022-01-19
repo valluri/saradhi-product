@@ -1,8 +1,8 @@
 import { Context } from 'moleculer';
 import { DataSeederHelper, ProductCategory, RepositoryBase } from '@valluri/saradhi-library';
-import { ProductConfig } from '@Entities/product-config';
+import { ProductConfig } from '@Entities/product/product-config';
 import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
-import { Product } from '@Entities/product';
+import { Product } from '@Entities/product/product';
 
 export class ConfigDataSeeder extends RepositoryBase {
 	public static async seed(ctx: Context) {
@@ -73,7 +73,7 @@ export class ConfigDataSeeder extends RepositoryBase {
 		const productConfig = new ProductConfig();
 		productConfig.productId = product.id!;
 		productConfig.key = key;
-		productConfig.defaultValue = defaultValue;
+		productConfig.value = defaultValue;
 		productConfig.description = description;
 
 		await DataSeederHelper.seedItem<ProductConfig>(ProductConfig, query, productConfig);

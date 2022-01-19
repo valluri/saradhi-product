@@ -1,11 +1,11 @@
 import { Constants, BaseModel } from '@valluri/saradhi-library';
 import { Entity, Column, Index } from 'typeorm';
 
-@Entity({ name: 'product_partner_config' })
-@Index(['productPartnerId'])
-export class ProductPartnerConfig extends BaseModel {
+@Entity({ name: 'product_config' })
+@Index(['productId'])
+export class ProductConfig extends BaseModel {
 	@Column({ nullable: false, type: 'uuid' })
-	productPartnerId: string;
+	productId: string;
 
 	@Column({ nullable: false })
 	key: string;
@@ -13,9 +13,12 @@ export class ProductPartnerConfig extends BaseModel {
 	@Column({ nullable: false })
 	value: string;
 
+	@Column({ nullable: true })
+	description?: string;
+
 	constructor() {
 		super();
-		this.productPartnerId = Constants.NULL_UUID;
+		this.productId = Constants.NULL_UUID;
 		this.key = '';
 		this.value = '';
 	}
