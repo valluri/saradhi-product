@@ -1,17 +1,19 @@
 import { Constants, BaseModel } from '@valluri/saradhi-library';
 import { Entity, Column, Index } from 'typeorm';
 
-@Entity({ name: 'product_config' })
+@Entity({ name: 'product_documents' })
 @Index(['productId'])
-export class ProductConfig extends BaseModel {
+export class ProductDocument extends BaseModel {
 	@Column({ nullable: false, type: 'uuid' })
 	productId: string;
 
 	@Column({ nullable: false })
-	key: string;
+	documentCode: string;
 
-	@Column({ nullable: false })
-	defaultValue: string;
+	documentName?: string;
+
+	@Column({ nullable: false, default: false })
+	mandatory: boolean;
 
 	@Column({ nullable: false })
 	description?: string;
@@ -19,7 +21,7 @@ export class ProductConfig extends BaseModel {
 	constructor() {
 		super();
 		this.productId = Constants.NULL_UUID;
-		this.key = '';
-		this.defaultValue = '';
+		this.documentCode = '';
+		this.mandatory = false;
 	}
 }

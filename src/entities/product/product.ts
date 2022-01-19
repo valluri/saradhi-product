@@ -1,9 +1,14 @@
-import { JourneyType } from '@valluri/saradhi-library';
+import { ProductCategory, NameCodeBaseModel, JourneyType } from '@valluri/saradhi-library';
 import { Entity, Column } from 'typeorm';
-import { BaseModel } from '@valluri/saradhi-library';
 
-@Entity({ name: 'product_partners' })
-export class ProductPartner extends BaseModel {
+@Entity({ name: 'products' })
+export class Product extends NameCodeBaseModel {
+	@Column({
+		type: 'enum',
+		enum: ProductCategory,
+	})
+	category: ProductCategory;
+
 	@Column({ nullable: false })
 	productCode: string;
 
@@ -25,5 +30,6 @@ export class ProductPartner extends BaseModel {
 		this.partnerCode = '';
 		this.priority = 10;
 		this.type = JourneyType.LeadOnly;
+		this.category = ProductCategory.MsmeLoan;
 	}
 }
