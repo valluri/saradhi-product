@@ -60,7 +60,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"@valluri/saradhi-library": "^0.1.73",
+		"@valluri/saradhi-library": "^0.1.74",
 		"async": "^3.2.1",
 		"axios": "^0.21.1",
 		"class-transformer": "^0.4.0",
@@ -79,7 +79,7 @@
 		"json2csv": "^5.0.6",
 		"jsonwebtoken": "^8.5.1",
 		"logform": "^2.2.0",
-		"marked": "^3.0.0",
+		"marked": "^4.0.10",
 		"moleculer": "^0.14.16",
 		"moleculer-decorators": "^1.3.0",
 		"moment": "^2.29.1",
