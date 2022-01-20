@@ -20,5 +20,9 @@ export class LendingProductConfigKeys {
 		KycUseElectronic: 'Kyc_Use_Electronic',
 		KycUseVideo: 'Kyc_Use_Video',
 		ProductPitch: 'Product_Pitch',
+		ResidenceAddressMinAge: 'Residence_Address_Min_Age',
+		BusinessMinVintage: 'Business_Min_Vintage',
+		TurnoverMin: 'Turnover_Min',
+		ProfitMin: 'Profit_Min',
 	};
 }

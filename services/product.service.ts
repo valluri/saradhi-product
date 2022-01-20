@@ -1,16 +1,31 @@
-import { Constants, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
-import { Action, Service } from 'moleculer-decorators';
+import { BaseModel, Constants, ErrorHelper, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
 import { ProductPinCode } from '@Entities/product/product-pincode';
 import { ProductRepository } from '@Repositories/product.repository';
+import { ClassConstructor } from 'class-transformer';
+import { EntityManager } from 'typeorm';
 
 @Service({
 	name: 'product',
 	version: 1,
 })
 export default class ProductService extends ServiceBase {
+	private static productConfigParams = {
+		productId: Constants.ParamValidation.id,
+		key: { type: 'string' },
+		value: { type: 'string' },
+		description: { type: 'string', optional: true },
+	};
+	private static productDocumentParams = {
+		productId: Constants.ParamValidation.id,
+		documentCode: { type: 'string' },
+		mandatory: Constants.ParamValidation.boolean,
+		description: { type: 'string', optional: true },
+	};
+
 	@Action({
 		params: {
 			productId: Constants.ParamValidation.id,
@@ -31,26 +46,38 @@ export default class ProductService extends ServiceBase {
 	}
 
 	@Action({
+		params: ProductService.productConfigParams,
+		security: {
+			requiredRight: RightsEnum.ProductConfig_Manage,
+		},
+	})
+	public async insertConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
+		return ProductRepository.insertResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
+	}
+
+	@Action({
 		params: {
-			config: {
-				type: 'array',
-				items: {
-					type: 'object',
-					props: {
-						productId: Constants.ParamValidation.id,
-						key: { type: 'string' },
-						value: { type: 'string' },
-						description: { type: 'string', optional: true },
-					},
-				},
-			},
+			id: Constants.ParamValidation.id,
+			...ProductService.productConfigParams,
 		},
 		security: {
 			requiredRight: RightsEnum.ProductConfig_Manage,
 		},
 	})
-	public async saveConfig(ctx: Context<{ config: ProductConfig[] }>): Promise<ProductConfig[]> {
-		return await ProductRepository.saveConfig(ctx, ctx.params.config);
+	public async updateConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
+		return ProductRepository.updateResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.ProductConfig_Manage,
+		},
+	})
+	public async deleteConfig(ctx: Context<{ id: string }>): Promise<ProductConfig> {
+		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductConfig, ctx.params.id);
 	}
 
 	@Action({
@@ -83,42 +110,38 @@ export default class ProductService extends ServiceBase {
 	}
 
 	@Action({
-		params: {
-			productId: Constants.ParamValidation.id,
-			documentCode: { type: 'string' },
-			mandatory: Constants.ParamValidation.boolean,
-			description: { type: 'string', optional: true },
-		},
+		params: ProductService.productDocumentParams,
 		security: {
 			requiredRight: RightsEnum.ProductConfig_Manage,
 		},
 	})
-	public async saveDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
-		let dbItem: ProductDocument = await ProductRepository.getResource(ctx, ProductDocument, {
-			where: { productId: ctx.params.productId, documentCode: ctx.params.documentCode },
-		});
-
-		if (dbItem) {
-			dbItem.mandatory = ctx.params.mandatory;
-			dbItem.description = ctx.params.description;
-		} else {
-			dbItem = ctx.params;
-			dbItem.id = undefined;
-		}
-
-		return (await ProductRepository.saveResources(ctx, ProductDocument, ctx.params)) as ProductDocument;
+	public async insertDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
+		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
 	}
 
 	@Action({
 		params: {
-			productDocumentId: Constants.ParamValidation.id,
+			id: Constants.ParamValidation.id,
+			...ProductService.productDocumentParams,
 		},
 		security: {
 			requiredRight: RightsEnum.ProductConfig_Manage,
 		},
 	})
-	public async deleteDocumentConfig(ctx: Context<{ productDocumentId: string }>): Promise<ProductDocument> {
-		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.productDocumentId);
+	public async updateDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
+		return ProductRepository.updateResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.ProductConfig_Manage,
+		},
+	})
+	public async deleteDocumentConfig(ctx: Context<{ id: string }>): Promise<ProductDocument> {
+		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
 	}
 }
 
