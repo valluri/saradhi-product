@@ -1,13 +1,15 @@
 'use strict';
 
+import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
+import PartnerService from '@MicroServices/partner.service';
 import ProductService from '@MicroServices/product.service';
 import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
-import { Utility } from '@valluri/saradhi-library';
+import { JourneyType, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
-const broker = TestHelper.getBroker([ProductService]);
+const broker = TestHelper.getBroker([ProductService, PartnerService]);
 let opts = {};
 
 beforeAll(async () => {
@@ -15,6 +17,30 @@ beforeAll(async () => {
 });
 
 afterAll(async () => await broker.stop());
+
+test('product  e2e', async () => {
+	let name: string = Utility.getRandomString(10);
+	const code: string = Utility.getRandomString(5);
+	const partnerCode: string = Utility.getRandomString(5);
+	const p: Product = new Product();
+	p.name = name;
+	p.code = code;
+	p.partnerCode = partnerCode;
+	p.journeyType = JourneyType.LeadOnly;
+
+	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
+	await ProductTestHelper.validateProduct(p);
+
+	savedProduct.name = Utility.getRandomString(10);
+	await broker.call('v1.product.updateProduct', savedProduct, opts);
+	await ProductTestHelper.validateProduct(savedProduct);
+
+	await broker.call('v1.product.deleteProduct', { id: savedProduct.id }, opts);
+	const allProducts: Product[] = await broker.call('v1.product.getProducts', {}, opts);
+	const pf = allProducts.filter((e) => e.code === p.code);
+
+	expect(pf).toBeArrayOfTypeOfLength(Product, 0);
+});
 
 test('product config e2e', async () => {
 	const productId: string = Utility.newGuid();
@@ -58,6 +84,21 @@ test('product document config e2e', async () => {
 });
 
 class ProductTestHelper {
+	static async validateProduct(p: Product) {
+		const allProducts: Product[] = await broker.call('v1.product.getProducts', {}, opts);
+		const pf = allProducts.filter((e) => e.code === p.code);
+
+		expect(pf).toBeArrayOfTypeOfLength(Product, 1);
+
+		expect(pf[0].id).toBeUuid();
+		expect(pf[0].name).toBe(p.name);
+		expect(pf[0].partnerCode).toBe(p.partnerCode);
+		expect(pf[0].journeyType).toBe(p.journeyType);
+		expect(pf[0].priority).toBe(p.priority);
+		expect(pf[0].preQualAction).toBe(p.preQualAction);
+		expect(pf[0].eligibilityAction).toBe(p.eligibilityAction);
+	}
+
 	static async validateProductConfig(productId: string, key: string, value: any) {
 		const p: ProductConfig[] = await broker.call('v1.product.getConfig', { productId }, opts);
 		const pf = p.filter((e) => e.productId === productId && e.key === key);

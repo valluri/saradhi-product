@@ -10,10 +10,9 @@ export class Product extends NameCodeBaseModel {
 	category: ProductCategory;
 
 	@Column({ nullable: false })
-	productCode: string;
-
-	@Column({ nullable: false })
 	partnerCode: string;
+
+	partnerName?: string;
 
 	@Column({ nullable: false, default: 10 })
 	priority: number;
@@ -22,14 +21,22 @@ export class Product extends NameCodeBaseModel {
 		type: 'enum',
 		enum: JourneyType,
 	})
-	type: JourneyType;
+	journeyType: JourneyType;
+
+	@Column({ nullable: false })
+	preQualAction: string;
+
+	@Column({ nullable: false })
+	eligibilityAction: string;
 
 	constructor() {
 		super();
-		this.productCode = '';
+
 		this.partnerCode = '';
 		this.priority = 10;
-		this.type = JourneyType.LeadOnly;
+		this.journeyType = JourneyType.LeadOnly;
 		this.category = ProductCategory.MsmeLoan;
+		this.preQualAction = '';
+		this.eligibilityAction = '';
 	}
 }

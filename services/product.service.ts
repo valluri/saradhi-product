@@ -1,18 +1,26 @@
-import { BaseModel, Constants, ErrorHelper, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
-import { Action, Method, Service } from 'moleculer-decorators';
+import { Constants, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Action, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
 import { ProductPinCode } from '@Entities/product/product-pincode';
-import { ProductRepository } from '@Repositories/product.repository';
-import { ClassConstructor } from 'class-transformer';
-import { EntityManager } from 'typeorm';
+import { ProductRepository } from '@Repositories/product-repository';
+import { Product } from '@Entities/product/product';
+import { Partner } from '@Entities/partner/partner';
 
 @Service({
 	name: 'product',
 	version: 1,
 })
 export default class ProductService extends ServiceBase {
+	private static productParams = {
+		code: { type: 'string' },
+		partnerCode: { type: 'string' },
+		priority: { type: 'number' },
+		journeyType: { type: 'string', optional: true },
+		preQualAction: { type: 'string', optional: true },
+		eligibilityAction: { type: 'string', optional: true },
+	};
 	private static productConfigParams = {
 		productId: Constants.ParamValidation.id,
 		key: { type: 'string' },
@@ -25,6 +33,61 @@ export default class ProductService extends ServiceBase {
 		mandatory: Constants.ParamValidation.boolean,
 		description: { type: 'string', optional: true },
 	};
+
+	@Action()
+	public async getProducts(ctx: Context): Promise<Product[]> {
+		const products: Product[] = await ProductRepository.getResources(ctx, Product, { where: {} }, true);
+
+		if (products.length === 0) {
+			return products;
+		}
+
+		const allPartners: Partner[] = await ctx.call('v1.partner.getPartners');
+
+		products.forEach((element) => {
+			const partner = allPartners.find((e) => e.code.toUpperCase() === element.partnerCode.toUpperCase());
+			if (partner) {
+				element.partnerName = partner.name;
+			}
+		});
+
+		return products;
+	}
+
+	@Action({
+		params: ProductService.productParams,
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async insertProduct(ctx: Context<Product>): Promise<Product> {
+		return ProductRepository.insertResource(ctx, Product, { code: ctx.params.code });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+			...ProductService.productParams,
+		},
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async updateProduct(ctx: Context<Product>): Promise<Product> {
+		return ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async deleteProduct(ctx: Context<{ id: string }>): Promise<Product> {
+		return await ProductRepository.doSoftDeleteUsingId(ctx, Product, ctx.params.id);
+	}
 
 	@Action({
 		params: {
@@ -48,7 +111,7 @@ export default class ProductService extends ServiceBase {
 	@Action({
 		params: ProductService.productConfigParams,
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async insertConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
@@ -61,7 +124,7 @@ export default class ProductService extends ServiceBase {
 			...ProductService.productConfigParams,
 		},
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async updateConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
@@ -73,7 +136,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 		},
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async deleteConfig(ctx: Context<{ id: string }>): Promise<ProductConfig> {
@@ -112,7 +175,7 @@ export default class ProductService extends ServiceBase {
 	@Action({
 		params: ProductService.productDocumentParams,
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async insertDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
@@ -125,7 +188,7 @@ export default class ProductService extends ServiceBase {
 			...ProductService.productDocumentParams,
 		},
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async updateDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
@@ -137,7 +200,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 		},
 		security: {
-			requiredRight: RightsEnum.ProductConfig_Manage,
+			requiredRight: RightsEnum.Product_Manage,
 		},
 	})
 	public async deleteDocumentConfig(ctx: Context<{ id: string }>): Promise<ProductDocument> {

@@ -43,12 +43,12 @@ export class TestDataSeeder extends RepositoryBase {
 		ctx.broker.logger.info('product seed done');
 	}
 
-	private static async seedProduct(ctx: Context, productCode: string, partnerCode: string, productPartnerType: JourneyType) {
-		const query = { where: { productCode, partnerCode, deleted: false } };
+	private static async seedProduct(ctx: Context, code: string, partnerCode: string, productPartnerType: JourneyType) {
+		const query = { where: { code, partnerCode, deleted: false } };
 		let p = new Product();
-		p.productCode = productCode;
+		p.code = code;
 		p.partnerCode = partnerCode;
-		p.type = productPartnerType;
+		p.journeyType = productPartnerType;
 		p = await DataSeederHelper.seedItem<Product>(Product, query, p);
 
 		const minAmount: number = Math.floor(Math.random() * 100);

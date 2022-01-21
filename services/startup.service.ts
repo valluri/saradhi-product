@@ -1,4 +1,4 @@
-import { RepositoryBase, ServiceBase } from '@valluri/saradhi-library';
+import { RepositoryBase, ServiceBase, Utility } from '@valluri/saradhi-library';
 import { Action, Event, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { TestDataSeeder } from '@Repositories/data-seeder-test';
@@ -23,9 +23,11 @@ export default class StartupService extends ServiceBase {
 		this.setEntitiesMethod();
 		await RepositoryBase.getConnection();
 
-		this.broker.waitForServices(['v1.systemSetting']).then(async () => {
-			await this.triggerSeedMethod();
-		});
+		if (Utility.getEnv('SEED_DATA', 'true') == 'true') {
+			this.broker.waitForServices(['v1.systemSetting']).then(async () => {
+				await this.triggerSeedMethod();
+			});
+		}
 	}
 
 	@Action({
