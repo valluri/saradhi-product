@@ -3,10 +3,7 @@ import { Entity, Column } from 'typeorm';
 
 @Entity({ name: 'products' })
 export class Product extends NameCodeBaseModel {
-	@Column({
-		type: 'enum',
-		enum: ProductCategory,
-	})
+	@Column({ type: 'enum', enum: ProductCategory })
 	category: ProductCategory;
 
 	@Column({ nullable: false })
@@ -17,10 +14,7 @@ export class Product extends NameCodeBaseModel {
 	@Column({ nullable: false, default: 10 })
 	priority: number;
 
-	@Column({
-		type: 'enum',
-		enum: JourneyType,
-	})
+	@Column({ type: 'enum', enum: JourneyType })
 	journeyType: JourneyType;
 
 	@Column({ nullable: false })

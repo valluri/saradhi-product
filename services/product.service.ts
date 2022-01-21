@@ -3,10 +3,11 @@ import { Action, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
-import { ProductPinCode } from '@Entities/product/product-pincode';
+import { ProductPreference } from '@Entities/product/product-preference';
 import { ProductRepository } from '@Repositories/product-repository';
 import { Product } from '@Entities/product/product';
 import { Partner } from '@Entities/partner/partner';
+import { ProductPreferenceType } from '@ServiceHelpers/enums';
 
 @Service({
 	name: 'product',
@@ -32,6 +33,12 @@ export default class ProductService extends ServiceBase {
 		documentCode: { type: 'string' },
 		mandatory: Constants.ParamValidation.boolean,
 		description: { type: 'string', optional: true },
+	};
+	private static productPreferenceParams = {
+		productId: Constants.ParamValidation.id,
+		type: { type: 'string' },
+		positive: Constants.ParamValidation.string_array,
+		negative: Constants.ParamValidation.string_array,
 	};
 
 	@Action()
@@ -205,6 +212,39 @@ export default class ProductService extends ServiceBase {
 	})
 	public async deleteDocumentConfig(ctx: Context<{ id: string }>): Promise<ProductDocument> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
+	}
+
+	@Action({
+		params: {
+			productId: Constants.ParamValidation.id,
+			type: { type: 'string' },
+		},
+	})
+	public async getProductPreference(ctx: Context<{ productId: string; type: ProductPreferenceType }>): Promise<ProductPreference> {
+		return await ProductRepository.getResource(ctx, ProductPreference, { where: { productId: ctx.params.productId, type: ctx.params.type } });
+	}
+
+	@Action({
+		params: ProductService.productPreferenceParams,
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async insertProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
+		return ProductRepository.insertResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+			...ProductService.productPreferenceParams,
+		},
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async updateProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
+		return ProductRepository.updateResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
 	}
 }
 

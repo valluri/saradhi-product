@@ -8,7 +8,7 @@ import { PartnerContact } from '@Entities/partner/partner-contact';
 import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
-import { ProductPinCode } from '@Entities/product/product-pincode';
+import { ProductPreference } from '@Entities/product/product-preference';
 
 @Service({
 	name: 'productStartup',
@@ -87,7 +87,7 @@ export default class StartupService extends ServiceBase {
 
 	@Method
 	private setEntitiesMethod() {
-		RepositoryBase.entities = [Partner, PartnerContact, Product, ProductConfig, ProductDocument, ProductPinCode];
+		RepositoryBase.entities = [Partner, PartnerContact, Product, ProductConfig, ProductDocument, ProductPreference];
 	}
 }
 

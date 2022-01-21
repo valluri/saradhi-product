@@ -3,8 +3,10 @@
 import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
+import { ProductPreference } from '@Entities/product/product-preference';
 import PartnerService from '@MicroServices/partner.service';
 import ProductService from '@MicroServices/product.service';
+import { ProductPreferenceType } from '@ServiceHelpers/enums';
 import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
 import { JourneyType, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
@@ -19,13 +21,10 @@ beforeAll(async () => {
 afterAll(async () => TestHelper.stopBroker(broker));
 
 test('product  e2e', async () => {
-	let name: string = Utility.getRandomString(10);
-	const code: string = Utility.getRandomString(5);
-	const partnerCode: string = Utility.getRandomString(5);
 	const p: Product = new Product();
-	p.name = name;
-	p.code = code;
-	p.partnerCode = partnerCode;
+	p.name = Utility.getRandomString(10);
+	p.code = Utility.getRandomString(5);
+	p.partnerCode = Utility.getRandomString(5);
 	p.journeyType = JourneyType.LeadOnly;
 
 	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
@@ -83,6 +82,22 @@ test('product document config e2e', async () => {
 	expect(pf).toBeArrayOfTypeOfLength(ProductDocument, 0);
 });
 
+test('product preference e2e', async () => {
+	let p1: ProductPreference = new ProductPreference();
+	p1.productId = Utility.newGuid();
+	p1.type = ProductPreferenceType.PinCode;
+	p1.positive = ['1', '2', '3'];
+	p1.negative = ['10', '20', '30'];
+
+	const savedPref: ProductPreference = await broker.call('v1.product.insertProductPreference', p1, opts);
+	await ProductTestHelper.validateProductPreference(p1);
+
+	savedPref.positive = ['4', '5', '6'];
+	savedPref.negative = ['40', '50', '60'];
+	await broker.call('v1.product.updateProductPreference', savedPref, opts);
+	await ProductTestHelper.validateProductPreference(savedPref);
+});
+
 class ProductTestHelper {
 	static async validateProduct(p: Product) {
 		const allProducts: Product[] = await broker.call('v1.product.getProducts', {}, opts);
@@ -127,5 +142,17 @@ class ProductTestHelper {
 		expect(pf[0].id).toBeUuid();
 		expect(pf[0].mandatory).toBe(mandatory);
 		expect(pf[0].description).toBe(description);
+	}
+
+	static async validateProductPreference(p: ProductPreference) {
+		const pf: ProductPreference = await broker.call('v1.product.getProductPreference', { productId: p.productId, type: p.type }, opts);
+
+		expect(pf).toBeOfType(ProductPreference);
+
+		expect(pf.id).toBeUuid();
+		expect(pf.productId).toBe(p.productId);
+		expect(pf.type).toBe(p.type);
+		expect(pf.positive).toStrictEqual(p.positive);
+		expect(pf.negative).toStrictEqual(p.negative);
 	}
 }
