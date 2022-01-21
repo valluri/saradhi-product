@@ -246,6 +246,28 @@ export default class ProductService extends ServiceBase {
 	public async updateProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
 		return ProductRepository.updateResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
 	}
+
+	@Action({
+		params: {
+			productId: Constants.ParamValidation.id,
+			type: { type: 'string' },
+			valueToCheck: { type: 'string', trim: true },
+		},
+	})
+	public async isPreferenceAllowed(ctx: Context<{ productId: string; type: ProductPreferenceType; valueToCheck: string }>): Promise<boolean> {
+		const p: ProductPreference = await ProductRepository.getResource(ctx, ProductPreference, {
+			where: { productId: ctx.params.productId, type: ctx.params.type },
+		});
+
+		if (p == null) {
+			return true;
+		}
+
+		const inNegativeList = p.negative.filter((e) => e === ctx.params.valueToCheck).length > 0;
+		const inPositiveList = p.positive.length === 0 || p.positive.filter((e) => e === ctx.params.valueToCheck).length > 0;
+
+		return inPositiveList && !inNegativeList;
+	}
 }
 
 module.exports = ProductService;

@@ -96,6 +96,21 @@ test('product preference e2e', async () => {
 	savedPref.negative = ['40', '50', '60'];
 	await broker.call('v1.product.updateProductPreference', savedPref, opts);
 	await ProductTestHelper.validateProductPreference(savedPref);
+
+	// positive
+	await ProductTestHelper.validateProductPreferenceValue(p1.productId, p1.type, '4', true);
+
+	// negative
+	await ProductTestHelper.validateProductPreferenceValue(p1.productId, p1.type, '40', false);
+
+	// absent config
+	await ProductTestHelper.validateProductPreferenceValue(p1.productId, ProductPreferenceType.Industry, '4', true);
+
+	// no positives. so all are allowed
+	p1.type = ProductPreferenceType.Occupation;
+	p1.positive = [];
+	await broker.call('v1.product.insertProductPreference', p1, opts);
+	await ProductTestHelper.validateProductPreferenceValue(p1.productId, p1.type, '4', true);
 });
 
 class ProductTestHelper {
@@ -154,5 +169,10 @@ class ProductTestHelper {
 		expect(pf.type).toBe(p.type);
 		expect(pf.positive).toStrictEqual(p.positive);
 		expect(pf.negative).toStrictEqual(p.negative);
+	}
+
+	static async validateProductPreferenceValue(productId: string, type: ProductPreferenceType, valueToCheck: string, expectedResult: boolean) {
+		const allowed: boolean = await broker.call('v1.product.isPreferenceAllowed', { productId, type, valueToCheck }, opts);
+		expect(allowed).toBe(expectedResult);
 	}
 }
