@@ -1,18 +1,18 @@
 'use strict';
 
 import { Partner } from '@Entities/partner/partner';
-import partnerService from '@MicroServices/partner.service';
+import PartnerService from '@MicroServices/partner.service';
 import { EntityStatusType, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
-const broker = TestHelper.getBroker([partnerService]);
+const broker = TestHelper.getBroker([PartnerService]);
 let opts = {};
 
 beforeAll(async () => {
 	opts = await TestHelper.startBroker(broker);
 });
 
-afterAll(async () => await broker.stop());
+afterAll(async () => await TestHelper.stopBroker(broker));
 
 test('partner  e2e', async () => {
 	let name: string = Utility.getRandomString(10);

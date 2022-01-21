@@ -52,23 +52,6 @@ export default class TestHelper {
 		return { meta: { jwt: returnValue.jwt } };
 	}
 
-	static async sleep(ms: number) {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms * 1000);
-		});
-	}
-
-	static getRandomName(length: number): string {
-		return randomstring.generate({
-			length: length,
-			charset: 'alphabetic',
-		});
-	}
-
-	static getRandomNumber(length: number): string {
-		return randomstring.generate(length);
-	}
-
 	static async testEnv(key: string, expectedValue: string) {
 		const val: string | undefined = process.env[key];
 

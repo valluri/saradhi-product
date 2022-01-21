@@ -16,7 +16,7 @@ beforeAll(async () => {
 	opts = await TestHelper.startBroker(broker);
 });
 
-afterAll(async () => await broker.stop());
+afterAll(async () => TestHelper.stopBroker(broker));
 
 test('product  e2e', async () => {
 	let name: string = Utility.getRandomString(10);

@@ -60,7 +60,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"@valluri/saradhi-library": "^0.1.77",
+		"@valluri/saradhi-library": "^0.1.83",
 		"async": "^3.2.1",
 		"axios": "^0.21.1",
 		"class-transformer": "^0.4.0",
@@ -143,7 +143,7 @@
 			"dotenv-flow/config"
 		],
 		"setupFilesAfterEnv": [
-			"<rootDir>/test/helpers/customMatchers.ts"
+			"./node_modules/@valluri/saradhi-library/dist/src/test/custom-matchers.js"
 		]
 	}
 }
