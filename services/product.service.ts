@@ -259,11 +259,16 @@ export default class ProductService extends ServiceBase {
 			where: { productId: ctx.params.productId, type: ctx.params.type },
 		});
 
+		// no config for this type. so all values are allowed
 		if (p == null) {
 			return true;
 		}
 
+		// is the value in the negative list
 		const inNegativeList = p.negative.filter((e) => e === ctx.params.valueToCheck).length > 0;
+
+		// if positive list is blank all values are allowed.
+		// if positives has some values, then ensure that the valueToCheck is present in there
 		const inPositiveList = p.positive.length === 0 || p.positive.filter((e) => e === ctx.params.valueToCheck).length > 0;
 
 		return inPositiveList && !inNegativeList;
