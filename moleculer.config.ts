@@ -26,6 +26,10 @@ const brokerConfig: BrokerOptions = {
 	// Unique node identifier. Must be unique in a namespace.
 	nodeID: undefined,
 
+	metadata: {
+		type: 'product',
+	},
+
 	cacher: 'redis://192.168.99.100:6379',
 
 	// Enable/disable logging or use custom logger. More info: https://moleculer.services/docs/0.14/logging.html

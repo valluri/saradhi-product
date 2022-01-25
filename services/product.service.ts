@@ -248,6 +248,7 @@ export default class ProductService extends ServiceBase {
 	}
 
 	@Action({
+		visibility: 'public',
 		params: {
 			productId: Constants.ParamValidation.id,
 			type: { type: 'string' },
