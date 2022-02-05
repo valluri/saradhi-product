@@ -21,8 +21,9 @@ export class PartnerContact extends BaseModel {
 	@Column({ nullable: true, comment: 'PII' })
 	role?: string;
 
-	@Column({ nullable: true })
-	additionalInfo?: string;
+	@Column({ type: 'json', nullable: true })
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	additionalInfo?: any;
 
 	@Column({ nullable: false })
 	status: EntityStatusType;
