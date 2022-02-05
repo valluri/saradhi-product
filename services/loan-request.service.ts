@@ -29,12 +29,13 @@ export default class LoanRequestService extends ServiceBase {
 		},
 	})
 	public async getAll(ctx: Context<PagedRequest>): Promise<PagedResponse<LoanRequest>> {
-		const reportees: UserReportee[] = await ctx.call('v1.userList.getReporteeIds');
-		const usersIds: string[] = reportees.map((e) => {
-			return e.reporteeId!;
-		});
-		usersIds.push(Utility.getUserIdFromMeta(ctx));
-		const filter = { createdBy: In(usersIds) };
+		// const reportees: UserReportee[] = await ctx.call('v1.userList.getReporteeIds');
+		// const usersIds: string[] = reportees.map((e) => {
+		// 	return e.reporteeId!;
+		// });
+		// usersIds.push(Utility.getUserIdFromMeta(ctx));
+		// const filter = { createdBy: In(usersIds) };
+		const filter = { createdBy: Utility.getUserIdFromMeta(ctx) };
 
 		return await LoanRequestRepository.getAll(ctx, filter);
 	}
@@ -43,13 +44,13 @@ export default class LoanRequestService extends ServiceBase {
 		params: {
 			firstName: { type: 'string', min: 3, max: 200 },
 			lastName: { type: 'string', min: 3, max: 200 },
-			gender: { type: 'string' },
-			mobile: { type: 'string', optional: true },
+			gender: { type: 'string', optional: true },
+			mobile: { type: 'string' },
 			email: { type: 'email', optional: true },
 			loanType: { type: 'string', min: 2, max: 200 },
 			loanAmount: { type: 'string', min: 2, max: 200 },
 			tenure: { type: 'string', optional: true },
-			additionalInfo: { type: 'string', optional: true },
+			additionalInfo: { type: 'object', optional: true },
 		},
 		security: {
 			requiredRight: RightsEnum.Loan_Request_Create,
