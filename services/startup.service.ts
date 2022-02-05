@@ -1,4 +1,4 @@
-import { RepositoryBase, ServiceBase, Utility } from '@valluri/saradhi-library';
+import { Address, RepositoryBase, ServiceBase, Utility } from '@valluri/saradhi-library';
 import { Action, Event, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { TestDataSeeder } from '@Repositories/data-seeder-test';
@@ -9,6 +9,11 @@ import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
 import { ProductPreference } from '@Entities/product/product-preference';
+import { Stage } from '@Entities/product/stage';
+import { ProductStage } from '@Entities/product/product-stage';
+import { LoanRequest } from '@Entities/loan-request';
+import { PersonInfo } from '@Entities/person-info';
+import { BusinessInfo } from '@Entities/business-info';
 
 @Service({
 	name: 'productStartup',
@@ -87,7 +92,20 @@ export default class StartupService extends ServiceBase {
 
 	@Method
 	private setEntitiesMethod() {
-		RepositoryBase.entities = [Partner, PartnerContact, Product, ProductConfig, ProductDocument, ProductPreference];
+		RepositoryBase.entities = [
+			Address,
+			Partner,
+			PartnerContact,
+			Product,
+			ProductConfig,
+			ProductDocument,
+			ProductPreference,
+			Stage,
+			ProductStage,
+			LoanRequest,
+			PersonInfo,
+			BusinessInfo,
+		];
 	}
 }
 
