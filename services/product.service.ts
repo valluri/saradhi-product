@@ -274,6 +274,29 @@ export default class ProductService extends ServiceBase {
 
 		return inPositiveList && !inNegativeList;
 	}
+
+	//TODO: Add tests for this
+	@Action({
+		params: ProductService.productDocumentParams,
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async insertListOfValue(ctx: Context<ProductDocument>): Promise<ProductDocument> {
+		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	})
+	public async deleteListOfValue(ctx: Context<{ id: string }>): Promise<ProductDocument> {
+		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
+	}
 }
 
 module.exports = ProductService;
