@@ -1,6 +1,7 @@
 'use strict';
 
 import { Partner } from '@Entities/partner/partner';
+import { PartnerContact } from '@Entities/partner/partner-contact';
 import PartnerService from '@MicroServices/partner.service';
 import { EntityStatusType, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
@@ -70,14 +71,14 @@ class PartnerTestHelper {
 		expect(pf[0].status).toBe(p.status);
 	}
 
-	static async validateContact(p: Partner) {
-		const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
-		const pf = allpartners.filter((e) => e.code === p.code);
+	static async validateContact(p: PartnerContact) {
+		const allpartners: PartnerContact[] = await broker.call('v1.partner.getPartners', {}, opts);
+		const pf = allpartners.filter((e) => e.email === p.email);
 
 		expect(pf).toBeArrayOfTypeOfLength(Partner, 1);
 
 		expect(pf[0].id).toBeUuid();
-		expect(pf[0].name).toBe(p.name);
+		expect(pf[0].email).toBe(p.email);
 		expect(pf[0].status).toBe(p.status);
 	}
 }
