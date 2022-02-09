@@ -69,4 +69,15 @@ class PartnerTestHelper {
 		expect(pf[0].name).toBe(p.name);
 		expect(pf[0].status).toBe(p.status);
 	}
+
+	static async validateContact(p: Partner) {
+		const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
+		const pf = allpartners.filter((e) => e.code === p.code);
+
+		expect(pf).toBeArrayOfTypeOfLength(Partner, 1);
+
+		expect(pf[0].id).toBeUuid();
+		expect(pf[0].name).toBe(p.name);
+		expect(pf[0].status).toBe(p.status);
+	}
 }
