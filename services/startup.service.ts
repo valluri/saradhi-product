@@ -78,7 +78,10 @@ export default class StartupService extends ServiceBase {
 			this.broker.logger.info('seed started');
 
 			const ctx: Context = this.broker.ContextFactory.create(this.broker);
-			await TestDataSeeder.seed(ctx);
+
+			if (!Utility.isProduction()) {
+				await TestDataSeeder.seed(ctx);
+			}
 			await ConfigDataSeeder.seed(ctx);
 
 			// *test data seed flag reset to false for next time container start
