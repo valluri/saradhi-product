@@ -44,14 +44,14 @@ test('partner contact e2e', async () => {
 	p.code = code;
 	p.status = EntityStatusType.Active;
 
-	const savedpartner: Partner = await broker.call('v1.partner.insertPartner', p, opts);
+	const savedpartner: Partner = await broker.call('v1.partner.insertContact', p, opts);
 	await PartnerTestHelper.validatePartner(p);
 
 	savedpartner.name = Utility.getRandomString(10);
-	await broker.call('v1.partner.updatePartner', savedpartner, opts);
+	await broker.call('v1.partner.updateContact', savedpartner, opts);
 	await PartnerTestHelper.validatePartner(savedpartner);
 
-	await broker.call('v1.partner.deletePartner', { id: savedpartner.id }, opts);
+	await broker.call('v1.partner.deleteContact', { id: savedpartner.id }, opts);
 	const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
 	const pf = allpartners.filter((e) => e.code === p.code);
 
