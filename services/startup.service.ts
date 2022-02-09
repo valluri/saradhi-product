@@ -82,6 +82,7 @@ export default class StartupService extends ServiceBase {
 			if (!Utility.isProduction()) {
 				await TestDataSeeder.seed(ctx);
 			}
+
 			await ConfigDataSeeder.seed(ctx);
 
 			// *test data seed flag reset to false for next time container start
