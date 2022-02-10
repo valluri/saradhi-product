@@ -19,7 +19,7 @@ export default class PartnerService extends ServiceBase {
 		partnerId: { type: 'string' },
 		name: { type: 'string' },
 		designation: { type: 'string' },
-		email: { type: 'string', optional: true },
+		email: { type: 'email', optional: true },
 		mobile: { type: 'string', optional: true },
 	};
 
@@ -69,7 +69,7 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async getContacts(ctx: Context<{ partnerId: string }>): Promise<PartnerContact[]> {
-		return await PartnerRepository.getResources(ctx, PartnerContact, ctx.params.partnerId);
+		return await PartnerRepository.getResources(ctx, PartnerContact, { where: { partnerId: ctx.params.partnerId } });
 	}
 
 	@Action({
