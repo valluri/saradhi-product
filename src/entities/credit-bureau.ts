@@ -37,11 +37,7 @@ export class CbRequest extends BaseModel {
 	@Column({ nullable: true })
 	identifier?: string;
 
-	@Column({
-		type: 'enum',
-		enum: CbIdType,
-		nullable: true,
-	})
+	@Column({ type: 'enum', enum: CbIdType, nullable: true })
 	identifierType: CbIdType;
 
 	@Column({ nullable: true })
@@ -70,41 +66,18 @@ export class CbRequest extends BaseModel {
 	@Column({ nullable: true })
 	state?: string;
 
-	@Column({
-		type: 'enum',
-		enum: CbStatusType,
-		nullable: true,
-	})
+	@Column({ type: 'enum', enum: CbStatusType, nullable: true })
 	status: CbStatusType;
 
 	@Column({ nullable: true })
 	telephone?: string;
 
-	@Column({
-		type: 'enum',
-		enum: TelephoneType,
-		nullable: true,
-	})
+	@Column({ type: 'enum', enum: TelephoneType, nullable: true })
 	telephoneType: TelephoneType;
 
 	@Column({ nullable: true })
 	uniqueRef?: string;
 
-	@Column({
-		type: 'enum',
-		enum: CbType,
-		nullable: true,
-	})
+	@Column({ type: 'enum', enum: CbType, nullable: true })
 	cbType?: CbType;
 }
-
-// public class CrifHighMarkConfig {
-// 	BaseUrl;
-// 	CertificateName;
-// 	MbrId;
-// 	Password;
-// 	S3BucketName;
-// 	SubMbrId;
-// 	UserId;
-
-// }

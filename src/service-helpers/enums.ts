@@ -39,3 +39,10 @@ export enum CbIdType {
 	VoterId = 'voterid',
 	Passport = 'passport',
 }
+
+export enum ProductPreferenceType {
+	PinCode = 'pincode',
+	Industry = 'industry ',
+	Occupation = 'cccupation ',
+	Constitution = 'constitution',
+}

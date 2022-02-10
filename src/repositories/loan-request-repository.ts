@@ -12,6 +12,6 @@ export class LoanRequestRepository extends RepositoryBase {
 	}
 
 	static async save(ctx: Context, request: LoanRequest): Promise<LoanRequest> {
-		return await super.saveResource<LoanRequest>(ctx, LoanRequest, request);
+		return (await super.saveResources<LoanRequest>(ctx, LoanRequest, request)) as LoanRequest;
 	}
 }

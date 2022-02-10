@@ -1,6 +1,6 @@
 {
 	"name": "saradhi-product",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "saradhi-product",
 	"repository": {
 		"type": "git",
@@ -48,10 +48,10 @@
 		"eslint-plugin-prettier": "^3.4.0",
 		"jest": "^27.0.6",
 		"jest-cli": "^27.0.6",
-		"jest-extended": "^0.11.5",
+		"jest-extended": "^1.1.0",
 		"jest-html-reporter": "^3.4.1",
 		"lodash": "^4.17.21",
-		"moleculer-repl": "^0.6.4",
+		"moleculer-repl": "^0.6.6",
 		"prettier": "^2.3.0",
 		"supertest": "^6.1.6",
 		"ts-jest": "^27.0.5",
@@ -60,7 +60,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"@valluri/saradhi-library": "^0.1.29",
+		"@valluri/saradhi-library": "^0.1.84",
 		"async": "^3.2.1",
 		"axios": "^0.21.1",
 		"class-transformer": "^0.4.0",
@@ -79,7 +79,7 @@
 		"json2csv": "^5.0.6",
 		"jsonwebtoken": "^8.5.1",
 		"logform": "^2.2.0",
-		"marked": "^3.0.0",
+		"marked": "^4.0.10",
 		"moleculer": "^0.14.16",
 		"moleculer-decorators": "^1.3.0",
 		"moment": "^2.29.1",
@@ -143,7 +143,7 @@
 			"dotenv-flow/config"
 		],
 		"setupFilesAfterEnv": [
-			"<rootDir>/test/helpers/customMatchers.ts"
+			"./node_modules/@valluri/saradhi-library/dist/src/test/custom-matchers.js"
 		]
 	}
 }

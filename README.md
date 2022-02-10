@@ -6,8 +6,9 @@
 
 1. `git clone https://github.com/valluri/saradhi-product.git`
 2. `cd saradhi-product`
-3. `npm i`
-4. run `npm install --legacy-peer-deps` if you get a `unable to resolve dependency tree` error.
+3. Ensure that you have a `.npmrc` in the root folder to read the library package
+4. `npm i`
+5. run `npm install --legacy-peer-deps` if you get a `unable to resolve dependency tree` error.
 
 ## Related Services
 
@@ -19,7 +20,7 @@
 
 ## Run
 
-`npm run serve`
+`npm run serve` or run from `saradhi-deploy\run.cmd`
 
 ## Test
 

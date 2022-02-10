@@ -45,8 +45,9 @@ export class PersonInfo extends BaseModel {
 	@JoinColumn()
 	permanentAddress?: Address;
 
-	@Column({ nullable: true })
-	additionalInfo?: string;
+	@Column({ type: 'json', nullable: true })
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	additionalInfo?: any;
 
 	constructor() {
 		super();
