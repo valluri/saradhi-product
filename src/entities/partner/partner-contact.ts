@@ -7,19 +7,16 @@ export class PartnerContact extends BaseModel {
 	partnerId: string;
 
 	@Column({ nullable: true, comment: 'PII' })
-	firstName: string;
+	name: string;
 
 	@Column({ nullable: true, comment: 'PII' })
-	lastName: string;
+	designation?: string;
 
 	@Column({ nullable: true, comment: 'PII' })
 	mobile?: string;
 
 	@Column({ nullable: true, comment: 'PII' })
 	email?: string;
-
-	@Column({ nullable: true, comment: 'PII' })
-	role?: string;
 
 	@Column({ type: 'json', nullable: true })
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,8 +28,7 @@ export class PartnerContact extends BaseModel {
 	constructor() {
 		super();
 		this.partnerId = Constants.NULL_UUID;
-		this.firstName = '';
-		this.lastName = '';
+		this.name = '';
 		this.status = EntityStatusType.Active;
 	}
 }
