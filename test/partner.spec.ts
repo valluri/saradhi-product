@@ -38,23 +38,31 @@ test('partner e2e', async () => {
 });
 
 test('partner contact e2e', async () => {
-	let name: string = Utility.getRandomString(10);
-	const code: string = Utility.getRandomString(5);
-	const p: Partner = new Partner();
-	p.name = name;
-	p.code = code;
+	const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
+	const partnerId: string = allpartners[0].id!;
+
+	const p: PartnerContact = new PartnerContact();
+	p.partnerId = partnerId;
+	p.name = Utility.getRandomString(10);
+	p.designation = Utility.getRandomString(5);
+	p.email = Utility.getRandomString(10) + '@gmail.com';
+	p.mobile = Utility.getRandomNumber(10);
+
 	p.status = EntityStatusType.Active;
 
-	const savedpartner: Partner = await broker.call('v1.partner.insertContact', p, opts);
-	await PartnerTestHelper.validatePartner(p);
+	const savedContact: PartnerContact = await broker.call('v1.partner.insertContact', p, opts);
+	await PartnerTestHelper.validateContact(p);
 
-	savedpartner.name = Utility.getRandomString(10);
-	await broker.call('v1.partner.updateContact', savedpartner, opts);
-	await PartnerTestHelper.validatePartner(savedpartner);
+	savedContact.name = Utility.getRandomString(10);
+	savedContact.designation = Utility.getRandomString(5);
+	savedContact.email = Utility.getRandomString(10) + '@gmail.com';
+	savedContact.mobile = Utility.getRandomNumber(10);
+	await broker.call('v1.partner.updateContact', savedContact, opts);
+	await PartnerTestHelper.validateContact(savedContact);
 
-	await broker.call('v1.partner.deleteContact', { id: savedpartner.id }, opts);
-	const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
-	const pf = allpartners.filter((e) => e.code === p.code);
+	await broker.call('v1.partner.deleteContact', { id: savedContact.id }, opts);
+	const allContacts: PartnerContact[] = await broker.call('v1.partner.getContacts', { partnerId }, opts);
+	const pf = allContacts.filter((e) => e.id === p.id);
 
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
@@ -71,14 +79,17 @@ class PartnerTestHelper {
 		expect(pf[0].status).toBe(p.status);
 	}
 
-	static async validateContact(p: PartnerContact) {
-		const allpartners: PartnerContact[] = await broker.call('v1.partner.getPartners', {}, opts);
-		const pf = allpartners.filter((e) => e.email === p.email);
+	static async validateContact(pc: PartnerContact) {
+		const allContacts: PartnerContact[] = await broker.call('v1.partner.getContacts', { partnerId: pc.partnerId }, opts);
+		const c = allContacts.filter((e) => e.email === pc.email);
 
-		expect(pf).toBeArrayOfTypeOfLength(Partner, 1);
+		expect(c).toBeArrayOfTypeOfLength(PartnerContact, 1);
 
-		expect(pf[0].id).toBeUuid();
-		expect(pf[0].email).toBe(p.email);
-		expect(pf[0].status).toBe(p.status);
+		expect(c[0].id).toBeUuid();
+		expect(c[0].name).toBe(pc.name);
+		expect(c[0].designation).toBe(pc.designation);
+		expect(c[0].email).toBe(pc.email);
+		expect(c[0].mobile).toBe(pc.mobile);
+		expect(c[0].status).toBe(pc.status);
 	}
 }
