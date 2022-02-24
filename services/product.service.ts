@@ -40,6 +40,16 @@ export default class ProductService extends ServiceBase {
 		positive: Constants.ParamValidation.string_array,
 		negative: Constants.ParamValidation.string_array,
 	};
+	private static productManageSecurity = {
+		security: {
+			requiredRight: RightsEnum.Product_Manage,
+		},
+	};
+	private static listEntryParams = {
+		productId: Constants.ParamValidation.id,
+		listType: { type: 'string' },
+		code: { type: 'string', min: 2, max: 100 },
+	};
 
 	@Action()
 	public async getProducts(ctx: Context): Promise<Product[]> {
@@ -63,9 +73,7 @@ export default class ProductService extends ServiceBase {
 
 	@Action({
 		params: ProductService.productParams,
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async insertProduct(ctx: Context<Product>): Promise<Product> {
 		return ProductRepository.insertResource(ctx, Product, { code: ctx.params.code });
@@ -76,9 +84,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 			...ProductService.productParams,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async updateProduct(ctx: Context<Product>): Promise<Product> {
 		return ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
@@ -88,9 +94,7 @@ export default class ProductService extends ServiceBase {
 		params: {
 			id: Constants.ParamValidation.id,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async deleteProduct(ctx: Context<{ id: string }>): Promise<Product> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, Product, ctx.params.id);
@@ -117,9 +121,7 @@ export default class ProductService extends ServiceBase {
 
 	@Action({
 		params: ProductService.productConfigParams,
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async insertConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
 		return ProductRepository.insertResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
@@ -130,9 +132,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 			...ProductService.productConfigParams,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async updateConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
 		return ProductRepository.updateResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
@@ -142,9 +142,7 @@ export default class ProductService extends ServiceBase {
 		params: {
 			id: Constants.ParamValidation.id,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async deleteConfig(ctx: Context<{ id: string }>): Promise<ProductConfig> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductConfig, ctx.params.id);
@@ -181,9 +179,7 @@ export default class ProductService extends ServiceBase {
 
 	@Action({
 		params: ProductService.productDocumentParams,
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async insertDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
 		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
@@ -194,9 +190,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 			...ProductService.productDocumentParams,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async updateDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
 		return ProductRepository.updateResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
@@ -206,9 +200,7 @@ export default class ProductService extends ServiceBase {
 		params: {
 			id: Constants.ParamValidation.id,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async deleteDocumentConfig(ctx: Context<{ id: string }>): Promise<ProductDocument> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
@@ -226,9 +218,7 @@ export default class ProductService extends ServiceBase {
 
 	@Action({
 		params: ProductService.productPreferenceParams,
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async insertProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
 		return ProductRepository.insertResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
@@ -239,9 +229,7 @@ export default class ProductService extends ServiceBase {
 			id: Constants.ParamValidation.id,
 			...ProductService.productPreferenceParams,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
 	public async updateProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
 		return ProductRepository.updateResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
@@ -277,12 +265,10 @@ export default class ProductService extends ServiceBase {
 
 	//TODO: Add tests for this
 	@Action({
-		params: ProductService.productDocumentParams,
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		params: ProductService.listEntryParams,
+		...ProductService.productManageSecurity,
 	})
-	public async insertListOfValue(ctx: Context<ProductDocument>): Promise<ProductDocument> {
+	public async insertListEntry(ctx: Context<ProductDocument>): Promise<ProductDocument> {
 		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
 	}
 
@@ -290,11 +276,9 @@ export default class ProductService extends ServiceBase {
 		params: {
 			id: Constants.ParamValidation.id,
 		},
-		security: {
-			requiredRight: RightsEnum.Product_Manage,
-		},
+		...ProductService.productManageSecurity,
 	})
-	public async deleteListOfValue(ctx: Context<{ id: string }>): Promise<ProductDocument> {
+	public async deleteListEntry(ctx: Context<{ id: string }>): Promise<ProductDocument> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
 	}
 }

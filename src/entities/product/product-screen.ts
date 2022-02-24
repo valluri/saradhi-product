@@ -1,14 +1,14 @@
 import { Constants, BaseModel } from '@valluri/saradhi-library';
 import { Entity, Column, Index } from 'typeorm';
 
-@Entity({ name: 'product_stages' })
+@Entity({ name: 'product_screens' })
 @Index(['productId'])
-export class ProductStage extends BaseModel {
+export class ProductScreen extends BaseModel {
 	@Column({ nullable: false, type: 'uuid' })
 	productId: string;
 
 	@Column({ nullable: false })
-	stageCode: string;
+	screenCode: string;
 
 	@Column({ nullable: false, default: 10 })
 	order: number;
@@ -16,7 +16,7 @@ export class ProductStage extends BaseModel {
 	constructor() {
 		super();
 		this.productId = Constants.NULL_UUID;
-		this.stageCode = '';
+		this.screenCode = '';
 		this.order = 10;
 	}
 }
