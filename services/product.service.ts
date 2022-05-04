@@ -1,4 +1,4 @@
-import { Constants, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
 import { Action, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
@@ -16,8 +16,8 @@ import { ProductPreferenceType } from '@ServiceHelpers/enums';
 export default class ProductService extends ServiceBase {
 	private static productParams = {
 		code: { type: 'string' },
-		partnerCode: { type: 'string' },
-		priority: { type: 'number' },
+		partnerId: { type: 'string' },
+		priority: { type: 'number', optional: true, default: 10 },
 		journeyType: { type: 'string', optional: true },
 		preQualAction: { type: 'string', optional: true },
 		eligibilityAction: { type: 'string', optional: true },
@@ -52,17 +52,17 @@ export default class ProductService extends ServiceBase {
 	};
 
 	@Action()
-	public async getProducts(ctx: Context): Promise<Product[]> {
-		const products: Product[] = await ProductRepository.getResources(ctx, Product, { where: {} }, true);
+	public async getProducts(ctx: Context): Promise<PagedResponse<Product>> {
+		const products: PagedResponse<Product> = await ProductRepository.getPagedResources(ctx, Product, { where: {} });
 
-		if (products.length === 0) {
+		if (products.total_count === 0) {
 			return products;
 		}
 
-		const allPartners: Partner[] = await ctx.call('v1.partner.getPartners');
+		const allPartners: PagedResponse<Partner> = await ctx.call('v1.partner.getPartners');
 
-		products.forEach((element) => {
-			const partner = allPartners.find((e) => e.code.toUpperCase() === element.partnerCode.toUpperCase());
+		products.items.forEach((element) => {
+			const partner = allPartners.items.find((e) => e.id!.toUpperCase() === element.id!.toUpperCase());
 			if (partner) {
 				element.partnerName = partner.name;
 			}
@@ -87,6 +87,8 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async updateProduct(ctx: Context<Product>): Promise<Product> {
+		// TODO: Prevent duplicate codes
+		// TODO: Should not update the partnerId, Code
 		return ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
 	}
 

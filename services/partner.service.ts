@@ -49,6 +49,7 @@ export default class PartnerService extends ServiceBase {
 	})
 	public async updatePartner(ctx: Context<Partner>): Promise<Partner> {
 		// TODO: Prevent duplicate codes
+		// TODO: Should not update the Code
 		return PartnerRepository.updateResource(ctx, Partner, { id: ctx.params.id });
 	}
 
