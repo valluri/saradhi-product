@@ -60,7 +60,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"@valluri/saradhi-library": "^0.1.92",
+		"@valluri/saradhi-library": "^0.1.96",
 		"async": "^3.2.1",
 		"axios": "^0.21.1",
 		"class-transformer": "^0.4.0",

@@ -1,4 +1,4 @@
-import { Constants, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
 import { Action, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { PartnerRepository } from '@Repositories/partner-repository';
@@ -24,8 +24,8 @@ export default class PartnerService extends ServiceBase {
 	};
 
 	@Action()
-	public async getPartners(ctx: Context): Promise<Partner[]> {
-		return await PartnerRepository.getResources(ctx, Partner, { where: {} }, true);
+	public async getPartners(ctx: Context): Promise<PagedResponse<Partner>> {
+		return await PartnerRepository.getPagedResources(ctx, Partner, { where: {} });
 	}
 
 	@Action({
@@ -35,7 +35,7 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async insertPartner(ctx: Context<Partner>): Promise<Partner> {
-		return PartnerRepository.insertResource(ctx, Partner, { code: ctx.params.code });
+		return PartnerRepository.insertResource(ctx, Partner, { code: ctx.params.code }, undefined, Messages.DUPLICATE_ENTITY_CODE);
 	}
 
 	@Action({
@@ -48,6 +48,7 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async updatePartner(ctx: Context<Partner>): Promise<Partner> {
+		// TODO: Prevent duplicate codes
 		return PartnerRepository.updateResource(ctx, Partner, { id: ctx.params.id });
 	}
 
@@ -68,8 +69,8 @@ export default class PartnerService extends ServiceBase {
 			partnerId: Constants.ParamValidation.id,
 		},
 	})
-	public async getContacts(ctx: Context<{ partnerId: string }>): Promise<PartnerContact[]> {
-		return await PartnerRepository.getResources(ctx, PartnerContact, { where: { partnerId: ctx.params.partnerId } });
+	public async getContacts(ctx: Context<{ partnerId: string }>): Promise<PagedResponse<PartnerContact>> {
+		return await PartnerRepository.getPagedResources(ctx, PartnerContact, { where: { partnerId: ctx.params.partnerId } });
 	}
 
 	@Action({
