@@ -40,7 +40,7 @@ export default class TestHelper {
 	}
 
 	static async getOptions(broker: ServiceBroker): Promise<{}> {
-		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.Mobile });
+		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.PhoneNumber });
 		const returnValue: { jwt: string; userDetails: any } = await broker.call('v1.login.loginUsingPhoneNumber', {
 			phoneNumber: TestHelper.USER_MOBILE,
 			otp: '123456',

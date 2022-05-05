@@ -8,7 +8,7 @@ import PartnerService from '@MicroServices/partner.service';
 import ProductService from '@MicroServices/product.service';
 import { ProductPreferenceType } from '@ServiceHelpers/enums';
 import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
-import { JourneyType, Utility } from '@valluri/saradhi-library';
+import { JourneyType, PagedResponse, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
 const broker = TestHelper.getBroker([ProductService, PartnerService]);
@@ -24,7 +24,7 @@ test('product  e2e', async () => {
 	const p: Product = new Product();
 	p.name = Utility.getRandomString(10);
 	p.code = Utility.getRandomString(5);
-	p.partnerCode = Utility.getRandomString(5);
+	p.partnerId = Utility.getRandomString(5);
 	p.journeyType = JourneyType.LeadOnly;
 
 	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
@@ -35,8 +35,8 @@ test('product  e2e', async () => {
 	await ProductTestHelper.validateProduct(savedProduct);
 
 	await broker.call('v1.product.deleteProduct', { id: savedProduct.id }, opts);
-	const allProducts: Product[] = await broker.call('v1.product.getProducts', {}, opts);
-	const pf = allProducts.filter((e) => e.code === p.code);
+	const allProducts: PagedResponse<Product> = await broker.call('v1.product.getProducts', {}, opts);
+	const pf = allProducts.items.filter((e) => e.code === p.code);
 
 	expect(pf).toBeArrayOfTypeOfLength(Product, 0);
 });
@@ -115,14 +115,14 @@ test('product preference e2e', async () => {
 
 class ProductTestHelper {
 	static async validateProduct(p: Product) {
-		const allProducts: Product[] = await broker.call('v1.product.getProducts', {}, opts);
-		const pf = allProducts.filter((e) => e.code === p.code);
+		const allProducts: PagedResponse<Product> = await broker.call('v1.product.getProducts', {}, opts);
+		const pf = allProducts.items.filter((e) => e.code === p.code);
 
 		expect(pf).toBeArrayOfTypeOfLength(Product, 1);
 
 		expect(pf[0].id).toBeUuid();
 		expect(pf[0].name).toBe(p.name);
-		expect(pf[0].partnerCode).toBe(p.partnerCode);
+		expect(pf[0].partnerId).toBe(p.partnerId);
 		expect(pf[0].journeyType).toBe(p.journeyType);
 		expect(pf[0].priority).toBe(p.priority);
 		expect(pf[0].preQualAction).toBe(p.preQualAction);

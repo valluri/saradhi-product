@@ -44,10 +44,12 @@ export class TestDataSeeder extends RepositoryBase {
 	}
 
 	private static async seedProduct(ctx: Context, code: string, partnerCode: string, productPartnerType: JourneyType) {
-		const query = { where: { code, partnerCode, deleted: false } };
+		const partner: Partner = await DataSeederHelper.getItem<Partner>(Partner, { where: { code: partnerCode } });
+		const query = { where: { code, partnerId: partner.id!, deleted: false } };
+
 		let p = new Product();
 		p.code = code;
-		p.partnerCode = partnerCode;
+		p.partnerId = partner.id!;
 		p.journeyType = productPartnerType;
 		p = await DataSeederHelper.seedItem<Product>(Product, query, p);
 

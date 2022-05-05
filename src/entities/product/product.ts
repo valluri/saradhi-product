@@ -7,7 +7,7 @@ export class Product extends NameCodeBaseModel {
 	category: ProductCategory;
 
 	@Column({ nullable: false })
-	partnerCode: string;
+	partnerId: string;
 
 	partnerName?: string;
 
@@ -26,7 +26,7 @@ export class Product extends NameCodeBaseModel {
 	constructor() {
 		super();
 
-		this.partnerCode = '';
+		this.partnerId = '';
 		this.priority = 10;
 		this.journeyType = JourneyType.LeadOnly;
 		this.category = ProductCategory.MsmeLoan;

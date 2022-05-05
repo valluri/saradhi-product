@@ -3,7 +3,7 @@
 import { Partner } from '@Entities/partner/partner';
 import { PartnerContact } from '@Entities/partner/partner-contact';
 import PartnerService from '@MicroServices/partner.service';
-import { EntityStatusType, Utility } from '@valluri/saradhi-library';
+import { EntityStatusType, PagedResponse, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
 const broker = TestHelper.getBroker([PartnerService]);
@@ -31,15 +31,15 @@ test('partner e2e', async () => {
 	await PartnerTestHelper.validatePartner(savedpartner);
 
 	await broker.call('v1.partner.deletePartner', { id: savedpartner.id }, opts);
-	const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
-	const pf = allpartners.filter((e) => e.code === p.code);
+	const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
+	const pf = allpartners.items.filter((e) => e.code === p.code);
 
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
 
 test('partner contact e2e', async () => {
-	const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
-	const partnerId: string = allpartners[0].id!;
+	const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
+	const partnerId: string = allpartners.items[0].id!;
 
 	const p: PartnerContact = new PartnerContact();
 	p.partnerId = partnerId;
@@ -61,16 +61,16 @@ test('partner contact e2e', async () => {
 	await PartnerTestHelper.validateContact(savedContact);
 
 	await broker.call('v1.partner.deleteContact', { id: savedContact.id }, opts);
-	const allContacts: PartnerContact[] = await broker.call('v1.partner.getContacts', { partnerId }, opts);
-	const pf = allContacts.filter((e) => e.id === p.id);
+	const allContacts: PagedResponse<PartnerContact> = await broker.call('v1.partner.getContacts', { partnerId }, opts);
+	const pf = allContacts.items.filter((e) => e.id === p.id);
 
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
 
 class PartnerTestHelper {
 	static async validatePartner(p: Partner) {
-		const allpartners: Partner[] = await broker.call('v1.partner.getPartners', {}, opts);
-		const pf = allpartners.filter((e) => e.code === p.code);
+		const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
+		const pf = allpartners.items.filter((e) => e.code === p.code);
 
 		expect(pf).toBeArrayOfTypeOfLength(Partner, 1);
 
@@ -80,8 +80,8 @@ class PartnerTestHelper {
 	}
 
 	static async validateContact(pc: PartnerContact) {
-		const allContacts: PartnerContact[] = await broker.call('v1.partner.getContacts', { partnerId: pc.partnerId }, opts);
-		const c = allContacts.filter((e) => e.email === pc.email);
+		const allContacts: PagedResponse<PartnerContact> = await broker.call('v1.partner.getContacts', { partnerId: pc.partnerId }, opts);
+		const c = allContacts.items.filter((e) => e.email === pc.email);
 
 		expect(c).toBeArrayOfTypeOfLength(PartnerContact, 1);
 
