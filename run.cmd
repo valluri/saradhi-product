@@ -2,4 +2,4 @@ git pull
 
 call npm i
 
-call npm run dev
+call npm run start-test
