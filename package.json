@@ -9,17 +9,10 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "cross-env NODE_ENV=dev ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/**/*.service.ts",
-		"dev-no-api": "ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/*.service.ts",
+		"start-test": "cross-env NODE_ENV=test ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/**/*.service.ts",
 		"start": "TS_NODE_PROJECT=tsconfig.production.json node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --config dist/moleculer.config.js dist/services",
-		"cli": "pankod-cli add",
 		"test": "cross-env NODE_ENV=e2e jest --coverage --runInBand --detectOpenHandles",
-		"clear-jest": "jest --clearCache",
-		"lint": "eslint -c .eslintrc.js --ext .ts {services,src,test}/**",
-		"format": "eslint -c .eslintrc.js --ext .ts --fix {services,src,test}/**",
-		"dc:up": "docker-compose up --build -d",
-		"dc:down": "docker-compose down",
-		"swagger": "swagger-jsdoc -d swagger/config.js -o swagger/swagger.json services/*.service.ts && node ./swagger/index.js",
-		"typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
+		"clear-jest": "jest --clearCache"		
 	},
 	"keywords": [
 		"microservices"
