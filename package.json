@@ -12,7 +12,7 @@
 		"start-test": "cross-env NODE_ENV=test ts-node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --env --hot --repl --config moleculer.config.ts services/**/*.service.ts",
 		"start": "TS_NODE_PROJECT=tsconfig.production.json node -r dotenv-flow/config -r tsconfig-paths/register ./node_modules/moleculer/bin/moleculer-runner.js --config dist/moleculer.config.js dist/services",
 		"test": "cross-env NODE_ENV=e2e jest --coverage --runInBand --detectOpenHandles",
-		"clear-jest": "jest --clearCache"		
+		"clear-jest": "jest --clearCache"
 	},
 	"keywords": [
 		"microservices"
@@ -53,7 +53,7 @@
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
-		"@valluri/saradhi-library": "^0.1.96",
+		"@valluri/saradhi-library": "^0.1.98",
 		"async": "^3.2.1",
 		"axios": "^0.21.1",
 		"class-transformer": "^0.4.0",
