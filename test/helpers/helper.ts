@@ -1,7 +1,7 @@
 import Moleculer, { ServiceBroker } from 'moleculer';
 import randomstring from 'randomstring';
 import StartupService from '@MicroServices/startup.service';
-import { OtpSendToType } from '@valluri/saradhi-library';
+import { LoginStatus, OtpSendToType } from '@valluri/saradhi-library';
 
 export default class TestHelper {
 	static userId: string = '';
@@ -41,12 +41,24 @@ export default class TestHelper {
 
 	static async getOptions(broker: ServiceBroker): Promise<{}> {
 		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.PhoneNumber });
-		const returnValue: { jwt: string; userDetails: any } = await broker.call('v1.login.loginUsingPhoneNumber', {
+		let returnValue: any = await broker.call('v1.login.loginUsingPhoneNumber', {
 			phoneNumber: TestHelper.USER_MOBILE,
 			otp: '123456',
 			platform: 'web',
 			killExistingSession: true,
 		});
+
+		console.log(returnValue);
+
+		if (returnValue.loginStatus == LoginStatus.ActiveSessionExists) {
+			returnValue = await broker.call('v1.login.loginUsingPhoneNumber', {
+				phoneNumber: TestHelper.USER_MOBILE,
+				otp: '123456',
+				platform: 'web',
+				killExistingSession: true,
+				securityGuid: returnValue.securityGuid,
+			});
+		}
 		TestHelper.userId = returnValue.userDetails.id!;
 
 		return { meta: { jwt: returnValue.jwt } };
