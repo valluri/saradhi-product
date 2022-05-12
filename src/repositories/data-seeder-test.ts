@@ -52,10 +52,14 @@ export class TestDataSeeder extends RepositoryBase {
 		p.partnerId = partner.id!;
 		p = await DataSeederHelper.seedItem<Product>(Product, query, p);
 
-		const minAmount: number = Math.floor(Math.random() * 100);
-		await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.CbCheckRequired, false);
-		await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.LoanAmountMin, minAmount);
-		await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.LoanAmountMax, minAmount + Math.floor(Math.random() * 100));
+		for (var x in ProductConfigKeys.ProductConfig) {
+			await TestDataSeeder.seedProductConfig(ctx, p.id!, x, '');
+		}
+
+		// const minAmount: number = Math.floor(Math.random() * 100);
+		// await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.CbCheckRequired, false);
+		// await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.LoanAmountMin, minAmount);
+		// await TestDataSeeder.seedProductConfig(ctx, p.id!, ProductConfigKeys.ProductConfig.LoanAmountMax, minAmount + Math.floor(Math.random() * 100));
 	}
 
 	private static async seedProductConfig(ctx: Context, productId: string, key: string, value: any) {
@@ -67,31 +71,31 @@ export class TestDataSeeder extends RepositoryBase {
 		await DataSeederHelper.seedItem(ProductConfig, query, t);
 	}
 
-	private static async seedProductConfigs(ctx: Context, productCode: string) {
-		const query = { where: { code: productCode, deleted: false } };
+	// private static async seedProductConfigs(ctx: Context, productCode: string) {
+	// 	const query = { where: { code: productCode, deleted: false } };
 
-		const product = await RepositoryBase.getResource(ctx, Product, query);
-		const productId = product.id!;
+	// 	const product = await RepositoryBase.getResource(ctx, Product, query);
+	// 	const productId = product.id!;
 
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.AgeMin, 18);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.AgeMax, 65);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.AgeMin, 18);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.AgeMax, 65);
 
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbScoreMin, 100);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbScoreMax, 700);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbAllowNewToCredit, true);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseCrif, true);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseCibil, true);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseExperian, false);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbScoreMin, 100);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbScoreMax, 700);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbAllowNewToCredit, true);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseCrif, true);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseCibil, true);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.CbUseExperian, false);
 
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountMin, 10000);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountMax, 1000000);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountStep, 10000);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureMin, 12);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureMax, 36);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureStep, 3);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountMin, 10000);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountMax, 1000000);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanAmountStep, 10000);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureMin, 12);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureMax, 36);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.LoanTenureStep, 3);
 
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseManual, true);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseElectronic, true);
-		await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseVideo, true);
-	}
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseManual, true);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseElectronic, true);
+	// 	await this.seedProductConfig(ctx, productId, ProductConfigKeys.ProductConfig.KycUseVideo, true);
+	// }
 }
