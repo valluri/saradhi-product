@@ -1,5 +1,6 @@
 'use strict';
 
+import { Partner } from '@Entities/partner/partner';
 import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
@@ -7,7 +8,7 @@ import { ProductPreference } from '@Entities/product/product-preference';
 import PartnerService from '@MicroServices/partner.service';
 import ProductService from '@MicroServices/product.service';
 import { ProductPreferenceType } from '@ServiceHelpers/enums';
-import { LendingProductConfigKeys } from '@ServiceHelpers/product-config-keys';
+import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
 import { JourneyType, PagedResponse, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
@@ -21,10 +22,12 @@ beforeAll(async () => {
 afterAll(async () => TestHelper.stopBroker(broker));
 
 test('product  e2e', async () => {
+	const partnerId: string = await ProductTestHelper.getPartnerId();
+
 	const p: Product = new Product();
 	p.name = Utility.getRandomString(10);
 	p.code = Utility.getRandomString(5);
-	p.partnerId = Utility.getRandomString(5);
+	p.partnerId = partnerId;
 
 	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
 	await ProductTestHelper.validateProduct(p);
@@ -41,23 +44,23 @@ test('product  e2e', async () => {
 });
 
 test('product config e2e', async () => {
-	const productId: string = Utility.newGuid();
-	const key = LendingProductConfigKeys.LendingProductConfig.AgeMin;
+	let product: Product = new Product();
+	product.name = Utility.getRandomString(10);
+	product.code = Utility.getRandomString(5);
+	product.partnerId = await ProductTestHelper.getPartnerId();
+
+	product = await broker.call('v1.product.insertProduct', product, opts);
+
+	const key = ProductConfigKeys.ProductConfig.AgeMin;
 
 	let value = '25';
-	const p: ProductConfig = await broker.call('v1.product.insertConfig', { productId, key, value }, opts);
-	await ProductTestHelper.validateProductConfig(productId, key, value);
+	const p: ProductConfig = await broker.call('v1.product.updateConfig', { productId: product.id, config: [{ key, value }] }, opts);
+	await ProductTestHelper.validateProductConfig(product.id!, key, value);
 
 	value = '26';
-	await broker.call('v1.product.updateConfig', { id: p.id, productId, key, value }, opts);
-	await ProductTestHelper.validateProductConfig(productId, key, value);
-	await ProductTestHelper.validateProductConfigUsingKey(productId, key, value);
-
-	await broker.call('v1.product.deleteConfig', { id: p.id }, opts);
-	const allConfig: ProductConfig[] = await broker.call('v1.product.getConfig', { productId }, opts);
-	const pf = allConfig.filter((e) => e.productId === productId && e.key === key);
-
-	expect(pf).toBeArrayOfTypeOfLength(ProductConfig, 0);
+	await broker.call('v1.product.updateConfig', { productId: product.id, config: [{ key, value }] }, opts);
+	await ProductTestHelper.validateProductConfig(product.id!, key, value);
+	await ProductTestHelper.validateProductConfigUsingKey(product.id!, key, value);
 });
 
 test('product document config e2e', async () => {
@@ -125,6 +128,10 @@ class ProductTestHelper {
 		expect(pf[0].priority).toBe(p.priority);
 	}
 
+	static async getPartnerId(): Promise<string> {
+		const allPartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
+		return allPartners.items[0].id!;
+	}
 	static async validateProductConfig(productId: string, key: string, value: any) {
 		const p: ProductConfig[] = await broker.call('v1.product.getConfig', { productId }, opts);
 		const pf = p.filter((e) => e.productId === productId && e.key === key);

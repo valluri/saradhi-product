@@ -1,5 +1,5 @@
-export class LendingProductConfigKeys {
-	public static LendingProductConfig = {
+export class ProductConfigKeys {
+	public static ProductConfig = {
 		AgeMin: 'Age_Min',
 		AgeMax: 'Age_Max',
 		AgeMaxAtApplicationOrMaturity: 'Age_Max_Application_Or_Maturity',

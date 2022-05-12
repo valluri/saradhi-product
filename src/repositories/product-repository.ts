@@ -7,7 +7,7 @@ import { EntityManager } from 'typeorm';
 
 export class ProductRepository extends RepositoryBase {
 	static async getConfig(ctx: Context, productId: string): Promise<ProductConfig[]> {
-		return await super.getResources(ctx, ProductConfig, { where: { productId } });
+		return await super.getResources(ctx, ProductConfig, { where: { productId } }, true);
 	}
 
 	static async getConfigForKey(ctx: Context, productId: string, key: string): Promise<ProductConfig> {
@@ -18,34 +18,34 @@ export class ProductRepository extends RepositoryBase {
 		return await super.getResources(ctx, ProductDocument, { where: { productId } });
 	}
 
-	public static async updateResource<T extends BaseModel>(
-		ctx: Context<T>,
-		entityClass: ClassConstructor<T>,
-		searchCondition: {},
-		entityManager?: EntityManager,
-		ignoreKeys?: string[],
-	): Promise<T> {
-		let dbItem: T = await RepositoryBase.getResource(ctx, entityClass, { where: searchCondition });
+	// public static async updateResource<T extends BaseModel>(
+	// 	ctx: Context<T>,
+	// 	entityClass: ClassConstructor<T>,
+	// 	searchCondition: {},
+	// 	entityManager?: EntityManager,
+	// 	ignoreKeys?: string[],
+	// ): Promise<T> {
+	// 	let dbItem: T = await RepositoryBase.getResource(ctx, entityClass, { where: searchCondition });
 
-		if (!dbItem) {
-			ErrorHelper.Throw404();
-		}
+	// 	if (!dbItem) {
+	// 		ErrorHelper.Throw404();
+	// 	}
 
-		const defaultIgnoreKeys: string[] = ['tenantId', 'createdDate', 'createdBy'];
+	// 	const defaultIgnoreKeys: string[] = ['tenantId', 'createdDate', 'createdBy'];
 
-		if (ignoreKeys) {
-			ignoreKeys = [...ignoreKeys, ...defaultIgnoreKeys];
-		} else {
-			ignoreKeys = [...defaultIgnoreKeys];
-		}
+	// 	if (ignoreKeys) {
+	// 		ignoreKeys = [...ignoreKeys, ...defaultIgnoreKeys];
+	// 	} else {
+	// 		ignoreKeys = [...defaultIgnoreKeys];
+	// 	}
 
-		for (var x in ctx.params) {
-			if (ignoreKeys.filter((e) => e == x).length == 0) {
-				// @ts-ignore
-				dbItem[x] = ctx.params[x];
-			}
-		}
+	// 	for (var x in ctx.params) {
+	// 		if (ignoreKeys.filter((e) => e == x).length == 0) {
+	// 			// @ts-ignore
+	// 			dbItem[x] = ctx.params[x];
+	// 		}
+	// 	}
 
-		return (await RepositoryBase.saveResources(ctx, entityClass, dbItem, entityManager)) as T;
-	}
+	// 	return (await RepositoryBase.saveResources(ctx, entityClass, dbItem, entityManager)) as T;
+	// }
 }

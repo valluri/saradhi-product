@@ -1,5 +1,5 @@
 import { Constants, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
-import { Action, Service } from 'moleculer-decorators';
+import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
@@ -8,6 +8,7 @@ import { ProductRepository } from '@Repositories/product-repository';
 import { Product } from '@Entities/product/product';
 import { Partner } from '@Entities/partner/partner';
 import { ProductPreferenceType } from '@ServiceHelpers/enums';
+import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
 
 @Service({
 	name: 'product',
@@ -19,12 +20,6 @@ export default class ProductService extends ServiceBase {
 		code: { type: 'string' },
 		description: { type: 'string', optional: true },
 		partnerId: { type: 'string' },
-	};
-	private static productConfigParams = {
-		productId: Constants.ParamValidation.id,
-		key: { type: 'string' },
-		value: { type: 'string' },
-		description: { type: 'string', optional: true },
 	};
 	private static productDocumentParams = {
 		productId: Constants.ParamValidation.id,
@@ -74,7 +69,10 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async insertProduct(ctx: Context<Product>): Promise<Product> {
-		return ProductRepository.insertResource(ctx, Product, { code: ctx.params.code });
+		const p: Product = await ProductRepository.insertResource(ctx, Product, { code: ctx.params.code });
+		await this.insertDefaultConfigMethod(ctx, p.id!);
+
+		return p;
 	}
 
 	@Action({
@@ -87,7 +85,7 @@ export default class ProductService extends ServiceBase {
 	public async updateProduct(ctx: Context<Product>): Promise<Product> {
 		// TODO: Prevent duplicate codes
 		// TODO: Should not update the partnerId, Code
-		return ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
+		return await ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
 	}
 
 	@Action({
@@ -120,32 +118,43 @@ export default class ProductService extends ServiceBase {
 	}
 
 	@Action({
-		params: ProductService.productConfigParams,
+		productId: Constants.ParamValidation.id,
 		...ProductService.productManageSecurity,
 	})
-	public async insertConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
-		return ProductRepository.insertResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
+	public async insertDefaultConfig(ctx: Context<ProductConfig>): Promise<ProductConfig[]> {
+		return await this.insertDefaultConfigMethod(ctx, ctx.params.productId);
 	}
 
 	@Action({
 		params: {
-			id: Constants.ParamValidation.id,
-			...ProductService.productConfigParams,
+			productId: Constants.ParamValidation.id,
+			config: {
+				type: 'array',
+				items: {
+					type: 'object',
+					props: {
+						key: { type: 'string' },
+						value: { type: 'string' },
+						description: { type: 'string', optional: true },
+					},
+				},
+			},
 		},
 		...ProductService.productManageSecurity,
 	})
-	public async updateConfig(ctx: Context<ProductConfig>): Promise<ProductConfig> {
-		return ProductRepository.updateResource(ctx, ProductConfig, { productId: ctx.params.productId, key: ctx.params.key });
-	}
+	public async updateConfig(ctx: Context<{ productId: string; config: ProductConfig[] }>): Promise<ProductConfig[]> {
+		const dbConfigs: ProductConfig[] = await ProductRepository.getConfig(ctx, ctx.params.productId);
 
-	@Action({
-		params: {
-			id: Constants.ParamValidation.id,
-		},
-		...ProductService.productManageSecurity,
-	})
-	public async deleteConfig(ctx: Context<{ id: string }>): Promise<ProductConfig> {
-		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductConfig, ctx.params.id);
+		dbConfigs.forEach((dbConfig) => {
+			const configParam = ctx.params.config.find((e) => e.key === dbConfig.key);
+
+			if (configParam) {
+				dbConfig.value = configParam.value;
+				dbConfig.description = configParam.description;
+			}
+		});
+
+		return (await ProductRepository.saveResources(ctx, ProductConfig, dbConfigs)) as ProductConfig[];
 	}
 
 	@Action({
@@ -182,7 +191,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async insertDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
-		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
+		return await ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
 	}
 
 	@Action({
@@ -193,7 +202,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async updateDocumentConfig(ctx: Context<ProductDocument>): Promise<ProductDocument> {
-		return ProductRepository.updateResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
+		return await ProductRepository.updateResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
 	}
 
 	@Action({
@@ -221,7 +230,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async insertProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
-		return ProductRepository.insertResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
+		return await ProductRepository.insertResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
 	}
 
 	@Action({
@@ -232,7 +241,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async updateProductPreference(ctx: Context<ProductPreference>): Promise<ProductPreference> {
-		return ProductRepository.updateResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
+		return await ProductRepository.updateResource(ctx, ProductPreference, { productId: ctx.params.productId, type: ctx.params.type });
 	}
 
 	@Action({
@@ -269,7 +278,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async insertListEntry(ctx: Context<ProductDocument>): Promise<ProductDocument> {
-		return ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
+		return await ProductRepository.insertResource(ctx, ProductDocument, { productId: ctx.params.productId, documentCode: ctx.params.documentCode });
 	}
 
 	@Action({
@@ -280,6 +289,22 @@ export default class ProductService extends ServiceBase {
 	})
 	public async deleteListEntry(ctx: Context<{ id: string }>): Promise<ProductDocument> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, ProductDocument, ctx.params.id);
+	}
+
+	@Method
+	private async insertDefaultConfigMethod(ctx: Context, productId: string): Promise<ProductConfig[]> {
+		const configs: ProductConfig[] = [];
+		for (var x in ProductConfigKeys.ProductConfig) {
+			const c: ProductConfig = new ProductConfig();
+			c.productId = productId;
+
+			// @ts-ignore
+			c.key = ProductConfigKeys.ProductConfig[x];
+
+			configs.push(c);
+		}
+
+		return (await ProductRepository.saveResources(ctx, ProductConfig, configs)) as ProductConfig[];
 	}
 }
 
