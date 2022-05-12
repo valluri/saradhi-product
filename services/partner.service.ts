@@ -94,7 +94,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async updateContact(ctx: Context<PartnerContact>): Promise<PartnerContact> {
-		return PartnerRepository.updateResource(ctx, PartnerContact, { id: ctx.params.id });
+		const ignoreKeys: string[] = ['partnerId'];
+		return PartnerRepository.updateResource(ctx, PartnerContact, { id: ctx.params.id }, undefined, ignoreKeys);
 	}
 
 	@Action({

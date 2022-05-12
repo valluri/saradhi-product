@@ -83,9 +83,8 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async updateProduct(ctx: Context<Product>): Promise<Product> {
-		// TODO: Prevent duplicate codes
-		// TODO: Should not update the partnerId, Code
-		return await ProductRepository.updateResource(ctx, Product, { id: ctx.params.id });
+		const ignoreKeys: string[] = ['partnerId'];
+		return await ProductRepository.updateResource(ctx, Product, { id: ctx.params.id }, undefined, ignoreKeys);
 	}
 
 	@Action({
