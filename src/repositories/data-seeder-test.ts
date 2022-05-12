@@ -18,10 +18,10 @@ export class TestDataSeeder extends RepositoryBase {
 
 	private static async seedPartners(ctx: Context) {
 		ctx.broker.logger.info('partner seed started');
-		await TestDataSeeder.seedPartner(ctx, 'ICICI', 'ICICI');
+
+		await TestDataSeeder.seedPartner(ctx, 'RBL', 'RBL');
 		await TestDataSeeder.seedPartner(ctx, 'Axis Bank ', 'AB');
-		await TestDataSeeder.seedPartner(ctx, 'Neo Growth', 'NG');
-		await TestDataSeeder.seedPartner(ctx, 'Samunnati', 'Samunnati');
+
 		ctx.broker.logger.info('partner seed done');
 	}
 
@@ -36,21 +36,20 @@ export class TestDataSeeder extends RepositoryBase {
 
 	private static async seedProducts(ctx: Context) {
 		ctx.broker.logger.info('product seed started');
-		await TestDataSeeder.seedProduct(ctx, '2W', 'ICICI', JourneyType.LeadOnly);
-		await TestDataSeeder.seedProduct(ctx, '2W', 'AB', JourneyType.LeadOnly);
-		await TestDataSeeder.seedProduct(ctx, 'MSME', 'NG', JourneyType.Full);
-		await TestDataSeeder.seedProduct(ctx, 'Agri', 'Samunnati', JourneyType.Full);
+
+		await TestDataSeeder.seedProduct(ctx, 'RBL-MFI', 'RBL');
+		await TestDataSeeder.seedProduct(ctx, 'AB-MFI', 'AB');
+
 		ctx.broker.logger.info('product seed done');
 	}
 
-	private static async seedProduct(ctx: Context, code: string, partnerCode: string, productPartnerType: JourneyType) {
+	private static async seedProduct(ctx: Context, code: string, partnerCode: string) {
 		const partner: Partner = await DataSeederHelper.getItem<Partner>(Partner, { where: { code: partnerCode } });
 		const query = { where: { code, partnerId: partner.id!, deleted: false } };
 
 		let p = new Product();
 		p.code = code;
 		p.partnerId = partner.id!;
-		p.journeyType = productPartnerType;
 		p = await DataSeederHelper.seedItem<Product>(Product, query, p);
 
 		const minAmount: number = Math.floor(Math.random() * 100);
@@ -71,5 +70,33 @@ export class TestDataSeeder extends RepositoryBase {
 		t.value = value.toString();
 
 		await DataSeederHelper.seedItem(ProductConfig, query, t);
+	}
+
+	private static async seedProductConfigs(ctx: Context, productCode: string) {
+		const query = { where: { code: productCode, deleted: false } };
+
+		const product = await RepositoryBase.getResource(ctx, Product, query);
+		const productId = product.id!;
+
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.AgeMin, 18);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.AgeMax, 65);
+
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbScoreMin, 100);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbScoreMax, 700);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbAllowNewToCredit, true);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbUseCrif, true);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbUseCibil, true);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.CbUseExperian, false);
+
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanAmountMin, 10000);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanAmountMax, 1000000);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanAmountStep, 10000);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanTenureMin, 12);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanTenureMax, 36);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.LoanTenureStep, 3);
+
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.KycUseManual, true);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.KycUseElectronic, true);
+		await this.seedProductConfig(ctx, productId, LendingProductConfigKeys.LendingProductConfig.KycUseVideo, true);
 	}
 }

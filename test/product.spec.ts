@@ -25,7 +25,6 @@ test('product  e2e', async () => {
 	p.name = Utility.getRandomString(10);
 	p.code = Utility.getRandomString(5);
 	p.partnerId = Utility.getRandomString(5);
-	p.journeyType = JourneyType.LeadOnly;
 
 	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
 	await ProductTestHelper.validateProduct(p);
@@ -123,10 +122,7 @@ class ProductTestHelper {
 		expect(pf[0].id).toBeUuid();
 		expect(pf[0].name).toBe(p.name);
 		expect(pf[0].partnerId).toBe(p.partnerId);
-		expect(pf[0].journeyType).toBe(p.journeyType);
 		expect(pf[0].priority).toBe(p.priority);
-		expect(pf[0].preQualAction).toBe(p.preQualAction);
-		expect(pf[0].eligibilityAction).toBe(p.eligibilityAction);
 	}
 
 	static async validateProductConfig(productId: string, key: string, value: any) {

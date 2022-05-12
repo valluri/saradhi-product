@@ -15,12 +15,10 @@ import { ProductPreferenceType } from '@ServiceHelpers/enums';
 })
 export default class ProductService extends ServiceBase {
 	private static productParams = {
+		name: { type: 'string' },
 		code: { type: 'string' },
+		description: { type: 'string', optional: true },
 		partnerId: { type: 'string' },
-		priority: { type: 'number', optional: true, default: 10 },
-		journeyType: { type: 'string', optional: true },
-		preQualAction: { type: 'string', optional: true },
-		eligibilityAction: { type: 'string', optional: true },
 	};
 	private static productConfigParams = {
 		productId: Constants.ParamValidation.id,

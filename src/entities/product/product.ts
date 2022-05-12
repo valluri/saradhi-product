@@ -1,12 +1,9 @@
-import { ProductCategory, NameCodeBaseModel, JourneyType } from '@valluri/saradhi-library';
+import { Constants, NameCodeBaseModel } from '@valluri/saradhi-library';
 import { Entity, Column } from 'typeorm';
 
 @Entity({ name: 'products' })
 export class Product extends NameCodeBaseModel {
-	@Column({ type: 'enum', enum: ProductCategory })
-	category: ProductCategory;
-
-	@Column({ nullable: false })
+	@Column({ nullable: false, default: Constants.NULL_UUID })
 	partnerId: string;
 
 	partnerName?: string;
@@ -14,23 +11,10 @@ export class Product extends NameCodeBaseModel {
 	@Column({ nullable: false, default: 10 })
 	priority: number;
 
-	@Column({ type: 'enum', enum: JourneyType })
-	journeyType: JourneyType;
-
-	@Column({ nullable: false })
-	preQualAction: string;
-
-	@Column({ nullable: false })
-	eligibilityAction: string;
-
 	constructor() {
 		super();
 
 		this.partnerId = '';
 		this.priority = 10;
-		this.journeyType = JourneyType.LeadOnly;
-		this.category = ProductCategory.MsmeLoan;
-		this.preQualAction = '';
-		this.eligibilityAction = '';
 	}
 }

@@ -48,8 +48,6 @@ export default class TestHelper {
 			killExistingSession: true,
 		});
 
-		console.log(returnValue);
-
 		if (returnValue.loginStatus == LoginStatus.ActiveSessionExists) {
 			returnValue = await broker.call('v1.login.loginUsingPhoneNumber', {
 				phoneNumber: TestHelper.USER_MOBILE,
