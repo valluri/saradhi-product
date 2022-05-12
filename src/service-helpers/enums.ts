@@ -46,3 +46,11 @@ export enum ProductPreferenceType {
 	Occupation = 'cccupation ',
 	Constitution = 'constitution',
 }
+
+export enum JlgStatusType {
+	Created = 'created',
+}
+
+export enum LoanApplicationStatusType {
+	Created = 'created',
+}

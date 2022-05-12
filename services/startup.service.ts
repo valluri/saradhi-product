@@ -14,6 +14,7 @@ import { ProductStage } from '@Entities/product/product-stage';
 import { LoanRequest } from '@Entities/loan-request';
 import { PersonInfo } from '@Entities/person-info';
 import { BusinessInfo } from '@Entities/business-info';
+import { Jlg } from '@Entities/loan-journey/jlg';
 
 @Service({
 	name: 'productStartup',
@@ -109,6 +110,7 @@ export default class StartupService extends ServiceBase {
 			LoanRequest,
 			PersonInfo,
 			BusinessInfo,
+			Jlg,
 		];
 	}
 }
