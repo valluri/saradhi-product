@@ -1,4 +1,4 @@
-import { Constants, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
 import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
@@ -69,7 +69,7 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async insertProduct(ctx: Context<Product>): Promise<Product> {
-		const p: Product = await ProductRepository.insertResource(ctx, Product, { code: ctx.params.code });
+		const p: Product = await ProductRepository.insertResource(ctx, Product, { code: ctx.params.code }, undefined, Messages.DUPLICATE_ENTITY_CODE);
 		await this.insertDefaultConfigMethod(ctx, p.id!);
 
 		return p;
