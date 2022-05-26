@@ -1,4 +1,4 @@
-import { Address, RepositoryBase, ServiceBase, Utility } from '@valluri/saradhi-library';
+import { Address, RepositoryBase, ServiceBase, TokenRequiredType, Utility } from '@valluri/saradhi-library';
 import { Action, Event, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { TestDataSeeder } from '@Repositories/data-seeder-test';
@@ -38,7 +38,7 @@ export default class StartupService extends ServiceBase {
 
 	@Action({
 		security: {
-			noChecks: true,
+			tokenRequired: TokenRequiredType.NotRequired,
 		},
 	})
 	public async triggerSeed(ctx: Context) {
@@ -47,7 +47,7 @@ export default class StartupService extends ServiceBase {
 
 	@Action({
 		security: {
-			noChecks: true,
+			tokenRequired: TokenRequiredType.NotRequired,
 		},
 	})
 	public getServerTime(ctx: Context): Date {

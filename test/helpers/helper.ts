@@ -6,7 +6,7 @@ import { LoginStatus, OtpSendToType } from '@valluri/saradhi-library';
 export default class TestHelper {
 	static userId: string = '';
 	static jwt: string = '';
-	static USER_MOBILE: string = '1234567890';
+	static USER_PHONE_NUMBER: string = '5234567890';
 
 	static getBroker(services: Moleculer.ServiceSchema[] = []): ServiceBroker {
 		const broker = new ServiceBroker({
@@ -40,9 +40,9 @@ export default class TestHelper {
 	}
 
 	static async getOptions(broker: ServiceBroker): Promise<{}> {
-		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_MOBILE, sendToType: OtpSendToType.PhoneNumber });
+		await broker.call('v1.otp.sendOtp', { sendTo: TestHelper.USER_PHONE_NUMBER, sendToType: OtpSendToType.PhoneNumber });
 		let returnValue: any = await broker.call('v1.login.loginUsingPhoneNumber', {
-			phoneNumber: TestHelper.USER_MOBILE,
+			phoneNumber: TestHelper.USER_PHONE_NUMBER,
 			otp: '123456',
 			platform: 'web',
 			killExistingSession: true,
@@ -50,7 +50,7 @@ export default class TestHelper {
 
 		if (returnValue.loginStatus == LoginStatus.ActiveSessionExists) {
 			returnValue = await broker.call('v1.login.loginUsingPhoneNumber', {
-				phoneNumber: TestHelper.USER_MOBILE,
+				phoneNumber: TestHelper.USER_PHONE_NUMBER,
 				otp: '123456',
 				platform: 'web',
 				killExistingSession: true,

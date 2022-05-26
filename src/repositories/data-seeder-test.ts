@@ -1,4 +1,4 @@
-import { JourneyType, ProductCategory, RepositoryBase, DataSeederHelper } from '@valluri/saradhi-library';
+import { RepositoryBase, DataSeederHelper, CtxMeta } from '@valluri/saradhi-library';
 import { Context } from 'moleculer';
 import { Partner } from '@Entities/partner/partner';
 import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
@@ -9,6 +9,7 @@ export class TestDataSeeder extends RepositoryBase {
 	public static async seed(ctx: Context) {
 		ctx.broker.logger.info('test data seed started');
 
+		(ctx.meta as CtxMeta).tenantId = await DataSeederHelper.getDefaultTenantId(ctx);
 		await TestDataSeeder.seedPartners(ctx);
 
 		await TestDataSeeder.seedProducts(ctx);
@@ -31,7 +32,7 @@ export class TestDataSeeder extends RepositoryBase {
 		partner.name = name;
 		partner.code = code;
 
-		await DataSeederHelper.seedItem<Partner>(Partner, query, partner);
+		await DataSeederHelper.seedItem<Partner>(ctx, Partner, query, partner);
 	}
 
 	private static async seedProducts(ctx: Context) {
@@ -44,13 +45,13 @@ export class TestDataSeeder extends RepositoryBase {
 	}
 
 	private static async seedProduct(ctx: Context, code: string, partnerCode: string) {
-		const partner: Partner = await DataSeederHelper.getItem<Partner>(Partner, { where: { code: partnerCode } });
+		const partner: Partner = await DataSeederHelper.getItem<Partner>(ctx, Partner, { where: { code: partnerCode } });
 		const query = { where: { code, partnerId: partner.id!, deleted: false } };
 
 		let p = new Product();
 		p.code = code;
 		p.partnerId = partner.id!;
-		p = await DataSeederHelper.seedItem<Product>(Product, query, p);
+		p = await DataSeederHelper.seedItem<Product>(ctx, Product, query, p);
 
 		for (var x in ProductConfigKeys.ProductConfig) {
 			await TestDataSeeder.seedProductConfig(ctx, p.id!, x, '');
@@ -68,7 +69,7 @@ export class TestDataSeeder extends RepositoryBase {
 		t.key = key;
 		t.value = value.toString();
 
-		await DataSeederHelper.seedItem(ProductConfig, query, t);
+		await DataSeederHelper.seedItem(ctx, ProductConfig, query, t);
 	}
 
 	// private static async seedProductConfigs(ctx: Context, productCode: string) {
