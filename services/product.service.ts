@@ -93,6 +93,16 @@ export default class ProductService extends ServiceBase {
 		},
 		...ProductService.productManageSecurity,
 	})
+	public async getProduct(ctx: Context<{ id: string }>): Promise<Product> {
+		return await ProductRepository.getResourceById(ctx, Product, ctx.params.id);
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		...ProductService.productManageSecurity,
+	})
 	public async deleteProduct(ctx: Context<{ id: string }>): Promise<Product> {
 		return await ProductRepository.doSoftDeleteUsingId(ctx, Product, ctx.params.id);
 	}

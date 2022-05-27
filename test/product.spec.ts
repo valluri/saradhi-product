@@ -29,12 +29,16 @@ test('product  e2e', async () => {
 	p.code = Utility.getRandomString(5);
 	p.partnerId = partnerId;
 
-	const savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
+	let savedProduct: Product = await broker.call('v1.product.insertProduct', p, opts);
 	await ProductTestHelper.validateProduct(p);
 
 	savedProduct.name = Utility.getRandomString(10);
 	await broker.call('v1.product.updateProduct', savedProduct, opts);
 	await ProductTestHelper.validateProduct(savedProduct);
+
+	const productId: string = savedProduct.id!;
+	savedProduct = await broker.call('v1.product.getProduct', { id: savedProduct.id }, opts);
+	expect(savedProduct.id).toBe(productId);
 
 	await broker.call('v1.product.deleteProduct', { id: savedProduct.id }, opts);
 	const allProducts: PagedResponse<Product> = await broker.call('v1.product.getProducts', {}, opts);
