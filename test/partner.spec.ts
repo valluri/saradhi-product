@@ -23,17 +23,20 @@ test('partner e2e', async () => {
 	p.code = code;
 	p.status = EntityStatusType.Active;
 
-	const savedpartner: Partner = await broker.call('v1.partner.insertPartner', p, opts);
+	let savedpartner: Partner = await broker.call('v1.partner.insertPartner', p, opts);
 	await PartnerTestHelper.validatePartner(p);
 
 	savedpartner.name = Utility.getRandomString(10);
 	await broker.call('v1.partner.updatePartner', savedpartner, opts);
 	await PartnerTestHelper.validatePartner(savedpartner);
 
+	const partnerId: string = savedpartner.id!;
+	savedpartner = await broker.call('v1.partner.getPartner', { id: savedpartner.id }, opts);
+	expect(savedpartner.id).toBe(partnerId);
+
 	await broker.call('v1.partner.deletePartner', { id: savedpartner.id }, opts);
 	const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
 	const pf = allpartners.items.filter((e) => e.code === p.code);
-
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
 

@@ -24,8 +24,21 @@ export default class PartnerService extends ServiceBase {
 	};
 
 	@Action()
+	// TODO:  Security??
 	public async getPartners(ctx: Context): Promise<PagedResponse<Partner>> {
 		return await PartnerRepository.getPagedResources(ctx, Partner, { where: {} });
+	}
+
+	@Action({
+		params: {
+			id: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.Partner_Manage,
+		},
+	})
+	public async getPartner(ctx: Context<{ id: string }>): Promise<Partner> {
+		return PartnerRepository.getResourceById(ctx, Partner, ctx.params.id);
 	}
 
 	@Action({
@@ -68,6 +81,9 @@ export default class PartnerService extends ServiceBase {
 	@Action({
 		params: {
 			partnerId: Constants.ParamValidation.id,
+		},
+		security: {
+			requiredRight: RightsEnum.Partner_Manage,
 		},
 	})
 	public async getContacts(ctx: Context<{ partnerId: string }>): Promise<PagedResponse<PartnerContact>> {
