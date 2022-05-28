@@ -1,4 +1,4 @@
-import { Constants, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, KeyValuePair2, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
 import { Action, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { PartnerRepository } from '@Repositories/partner-repository';
@@ -124,6 +124,21 @@ export default class PartnerService extends ServiceBase {
 	})
 	public async deleteContact(ctx: Context<{ id: string }>): Promise<PartnerContact> {
 		return await PartnerRepository.doSoftDeleteUsingId(ctx, PartnerContact, ctx.params.id);
+	}
+
+	@Action({
+		params: {
+			ids: Constants.ParamValidation.ids,
+		},
+	})
+	// TODO: Cache this
+	public async getForEnrichment(ctx: Context<{ ids: string[] }>): Promise<KeyValuePair2<string, string>[]> {
+		const returnValue = await PartnerRepository.getForEnrichment(ctx, ctx.params.ids);
+
+		return returnValue.map((e) => {
+			const displayName: string = `${e.name} (${e.code})`.trim();
+			return new KeyValuePair2<string, string>(e.id!, displayName);
+		});
 	}
 }
 

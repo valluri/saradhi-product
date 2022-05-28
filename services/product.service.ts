@@ -1,4 +1,4 @@
-import { Constants, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, EnrichmentHelper, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
 import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
@@ -52,16 +52,7 @@ export default class ProductService extends ServiceBase {
 			return products;
 		}
 
-		const allPartners: PagedResponse<Partner> = await ctx.call('v1.partner.getPartners');
-
-		products.items.forEach((element) => {
-			const partner = allPartners.items.find((e) => e.id!.toUpperCase() === element.id!.toUpperCase());
-			if (partner) {
-				element.partnerName = partner.name;
-			}
-		});
-
-		return products;
+		return await this.enrich(ctx, products);
 	}
 
 	@Action({
@@ -72,7 +63,7 @@ export default class ProductService extends ServiceBase {
 		const p: Product = await ProductRepository.insertResource(ctx, Product, { code: ctx.params.code }, undefined, Messages.DUPLICATE_ENTITY_CODE);
 		await this.insertDefaultConfigMethod(ctx, p.id!);
 
-		return p;
+		return await this.enrich(ctx, p);
 	}
 
 	@Action({
@@ -84,7 +75,8 @@ export default class ProductService extends ServiceBase {
 	})
 	public async updateProduct(ctx: Context<Product>): Promise<Product> {
 		const ignoreKeys: string[] = ['partnerId'];
-		return await ProductRepository.updateResource(ctx, Product, { id: ctx.params.id }, undefined, ignoreKeys);
+		const p: Product = await ProductRepository.updateResource(ctx, Product, { id: ctx.params.id }, undefined, ignoreKeys);
+		return await this.enrich(ctx, p);
 	}
 
 	@Action({
@@ -94,7 +86,8 @@ export default class ProductService extends ServiceBase {
 		...ProductService.productManageSecurity,
 	})
 	public async getProduct(ctx: Context<{ id: string }>): Promise<Product> {
-		return await ProductRepository.getResourceById(ctx, Product, ctx.params.id);
+		const p: Product = await ProductRepository.getResourceById(ctx, Product, ctx.params.id);
+		return await this.enrich(ctx, p);
 	}
 
 	@Action({
@@ -314,6 +307,15 @@ export default class ProductService extends ServiceBase {
 		}
 
 		return (await ProductRepository.saveResources(ctx, ProductConfig, configs)) as ProductConfig[];
+	}
+
+	private async enrich(ctx: Context, data: Product): Promise<Product>;
+
+	private async enrich(ctx: Context, data: PagedResponse<Product>): Promise<PagedResponse<Product>>;
+
+	@Method
+	private async enrich(ctx: Context, data: Product | PagedResponse<Product>): Promise<Product | PagedResponse<Product>> {
+		return await EnrichmentHelper.enrich(ctx, data, ['partnerId'], 'v1.partner.getForEnrichment');
 	}
 }
 
