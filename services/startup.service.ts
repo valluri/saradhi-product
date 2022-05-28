@@ -27,7 +27,7 @@ export default class StartupService extends ServiceBase {
 		console.log(`Connecting to DB at ${process.env.TYPEORM_HOST}:${process.env.TYPEORM_PORT}`);
 
 		this.setEntitiesMethod();
-		await RepositoryBase.getConnection();
+		await RepositoryBase.getDataSource();
 
 		if (Utility.getEnv('SEED_DATA', 'true') == 'true') {
 			this.broker.waitForServices(['v1.systemSetting']).then(async () => {
@@ -58,7 +58,7 @@ export default class StartupService extends ServiceBase {
 		name: '$broker.stopped',
 	})
 	private async stop() {
-		await RepositoryBase.closeConnection();
+		await RepositoryBase.closeDataSource();
 	}
 
 	@Method
