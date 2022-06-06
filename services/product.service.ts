@@ -1,4 +1,4 @@
-import { Constants, EnrichmentHelper, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Constants, Messages, PagedResponse, RightsEnum, ServiceBase, EnrichmentHelper } from '@valluri/saradhi-library';
 import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
@@ -6,7 +6,6 @@ import { ProductDocument } from '@Entities/product/product-document';
 import { ProductPreference } from '@Entities/product/product-preference';
 import { ProductRepository } from '@Repositories/product-repository';
 import { Product } from '@Entities/product/product';
-import { Partner } from '@Entities/partner/partner';
 import { ProductPreferenceType } from '@ServiceHelpers/enums';
 import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
 
@@ -315,7 +314,8 @@ export default class ProductService extends ServiceBase {
 
 	@Method
 	private async enrich(ctx: Context, data: Product | PagedResponse<Product>): Promise<Product | PagedResponse<Product>> {
-		return await EnrichmentHelper.enrich(ctx, data, ['partnerId'], 'v1.partner.getForEnrichment');
+		data = await EnrichmentHelper.enrich(ctx, data, ['partnerId'], 'v1.partner.getForEnrichment');
+		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds');
 	}
 }
 

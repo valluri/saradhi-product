@@ -1,5 +1,5 @@
-import { Constants, KeyValuePair2, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
-import { Action, Service } from 'moleculer-decorators';
+import { Constants, EnrichmentHelper, KeyValuePair2, Messages, PagedResponse, RightsEnum, ServiceBase } from '@valluri/saradhi-library';
+import { Action, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { PartnerRepository } from '@Repositories/partner-repository';
 import { Partner } from '@Entities/partner/partner';
@@ -23,10 +23,14 @@ export default class PartnerService extends ServiceBase {
 		mobile: { type: 'string', optional: true },
 	};
 
-	@Action()
-	// TODO:  Security??
+	@Action({
+		security: {
+			requiredRight: RightsEnum.Partner_Manage,
+		},
+	})
 	public async getPartners(ctx: Context): Promise<PagedResponse<Partner>> {
-		return await PartnerRepository.getPagedResources(ctx, Partner, { where: {} });
+		const returnValue = await PartnerRepository.getPagedResources(ctx, Partner, { where: {} });
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -38,7 +42,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async getPartner(ctx: Context<{ id: string }>): Promise<Partner> {
-		return PartnerRepository.getResourceById(ctx, Partner, ctx.params.id);
+		const returnValue = await PartnerRepository.getResourceById(ctx, Partner, ctx.params.id);
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -48,7 +53,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async insertPartner(ctx: Context<Partner>): Promise<Partner> {
-		return PartnerRepository.insertResource(ctx, Partner, { code: ctx.params.code }, undefined, Messages.DUPLICATE_ENTITY_CODE);
+		const returnValue = await PartnerRepository.insertResource(ctx, Partner, { code: ctx.params.code }, undefined, Messages.DUPLICATE_ENTITY_CODE);
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -63,7 +69,8 @@ export default class PartnerService extends ServiceBase {
 	public async updatePartner(ctx: Context<Partner>): Promise<Partner> {
 		// TODO: Prevent duplicate codes
 		// TODO: Should not update the Code
-		return PartnerRepository.updateResource(ctx, Partner, { id: ctx.params.id });
+		const returnValue = await PartnerRepository.updateResource(ctx, Partner, { id: ctx.params.id });
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -75,7 +82,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async deletePartner(ctx: Context<{ id: string }>): Promise<Partner> {
-		return await PartnerRepository.doSoftDeleteUsingId(ctx, Partner, ctx.params.id);
+		const returnValue = await PartnerRepository.doSoftDeleteUsingId(ctx, Partner, ctx.params.id);
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -87,7 +95,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async getContacts(ctx: Context<{ partnerId: string }>): Promise<PagedResponse<PartnerContact>> {
-		return await PartnerRepository.getPagedResources(ctx, PartnerContact, { where: { partnerId: ctx.params.partnerId } });
+		const returnValue = await PartnerRepository.getPagedResources(ctx, PartnerContact, { where: { partnerId: ctx.params.partnerId } });
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -97,7 +106,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async insertContact(ctx: Context<PartnerContact>): Promise<PartnerContact> {
-		return PartnerRepository.insertResource(ctx, PartnerContact, { partnerId: ctx.params.partnerId, email: ctx.params.email });
+		const returnValue = await PartnerRepository.insertResource(ctx, PartnerContact, { partnerId: ctx.params.partnerId, email: ctx.params.email });
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -111,7 +121,8 @@ export default class PartnerService extends ServiceBase {
 	})
 	public async updateContact(ctx: Context<PartnerContact>): Promise<PartnerContact> {
 		const ignoreKeys: string[] = ['partnerId'];
-		return PartnerRepository.updateResource(ctx, PartnerContact, { id: ctx.params.id }, undefined, ignoreKeys);
+		const returnValue = await PartnerRepository.updateResource(ctx, PartnerContact, { id: ctx.params.id }, undefined, ignoreKeys);
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -123,7 +134,8 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async deleteContact(ctx: Context<{ id: string }>): Promise<PartnerContact> {
-		return await PartnerRepository.doSoftDeleteUsingId(ctx, PartnerContact, ctx.params.id);
+		const returnValue = await PartnerRepository.doSoftDeleteUsingId(ctx, PartnerContact, ctx.params.id);
+		return await this.enrich(ctx, returnValue);
 	}
 
 	@Action({
@@ -139,6 +151,22 @@ export default class PartnerService extends ServiceBase {
 			const displayName: string = `${e.name} (${e.code})`.trim();
 			return new KeyValuePair2<string, string>(e.id!, displayName);
 		});
+	}
+
+	private async enrich(ctx: Context, data: Partner): Promise<Partner>;
+
+	private async enrich(ctx: Context, data: PagedResponse<Partner>): Promise<PagedResponse<Partner>>;
+
+	private async enrich(ctx: Context, data: PartnerContact): Promise<PartnerContact>;
+
+	private async enrich(ctx: Context, data: PagedResponse<PartnerContact>): Promise<PagedResponse<PartnerContact>>;
+
+	@Method
+	private async enrich(
+		ctx: Context,
+		data: Partner | PagedResponse<Partner> | PartnerContact | PagedResponse<PartnerContact>,
+	): Promise<Partner | PagedResponse<Partner> | PartnerContact | PagedResponse<PartnerContact>> {
+		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds');
 	}
 }
 
