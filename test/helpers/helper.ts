@@ -10,7 +10,7 @@ export default class TestHelper {
 
 	static getBroker(services: Moleculer.ServiceSchema[] = []): ServiceBroker {
 		const broker = new ServiceBroker({
-			namespace: 'saradhi',
+			namespace: 'sarthi',
 			transporter: process.env.TRANSPORTER,
 			cacher: 'Memory',
 			metrics: true,

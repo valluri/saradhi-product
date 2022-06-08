@@ -3,7 +3,7 @@ import { BrokerOptions } from 'moleculer';
 import 'reflect-metadata';
 import * as Moleculer from 'moleculer';
 import MoleculerRetryableError = Moleculer.Errors.MoleculerRetryableError;
-const SaradhiTracer = require('@valluri/saradhi-library/dist/src/service-helpers/service-trace-helper');
+const SarthiTracer = require('@valluri/saradhi-library/dist/src/service-helpers/service-trace-helper');
 
 /**
  * Moleculer ServiceBroker configuration file
@@ -22,7 +22,7 @@ const SaradhiTracer = require('@valluri/saradhi-library/dist/src/service-helpers
  */
 const brokerConfig: BrokerOptions = {
 	// Namespace of nodes to segment your nodes on the same network.
-	namespace: 'saradhi',
+	namespace: 'sarthi',
 	// Unique node identifier. Must be unique in a namespace.
 	nodeID: undefined,
 
@@ -67,7 +67,7 @@ const brokerConfig: BrokerOptions = {
 
 	tracing: {
 		enabled: true,
-		exporter: [new SaradhiTracer()],
+		exporter: [new SarthiTracer()],
 		// exporter: {
 		// 	type: 'Jaeger',
 		// 	options: {

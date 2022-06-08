@@ -1,6 +1,6 @@
 ## About
 
-**Saradhi Product**
+**Sarthi Product**
 
 ## Development Setup
 
