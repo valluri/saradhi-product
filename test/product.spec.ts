@@ -5,14 +5,13 @@ import { Product } from '@Entities/product/product';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
 import { ProductPreference } from '@Entities/product/product-preference';
-import PartnerService from '@MicroServices/partner.service';
-import ProductService from '@MicroServices/product.service';
 import { ProductPreferenceType } from '@ServiceHelpers/enums';
 import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
-import { JourneyType, PagedResponse, Utility } from '@valluri/saradhi-library';
+import { PagedResponse, Utility } from '@valluri/saradhi-library';
+import { plainToClass } from 'class-transformer';
 import TestHelper from './helpers/helper';
 
-const broker = TestHelper.getBroker([ProductService, PartnerService]);
+const broker = TestHelper.getBroker([]);
 let opts = {};
 
 beforeAll(async () => {
@@ -42,8 +41,9 @@ test('product  e2e', async () => {
 
 	await broker.call('v1.product.deleteProduct', { id: savedProduct.id }, opts);
 	const allProducts: PagedResponse<Product> = await broker.call('v1.product.getProducts', {}, opts);
-	const pf = allProducts.items.filter((e) => e.code === p.code);
+	let pf = allProducts.items.filter((e) => e.code === p.code);
 
+	pf = plainToClass(Product, pf);
 	expect(pf).toBeArrayOfTypeOfLength(Product, 0);
 });
 
@@ -83,8 +83,9 @@ test('product document config e2e', async () => {
 
 	await broker.call('v1.product.deleteDocumentConfig', { id: p.id }, opts);
 	const allConfig: ProductDocument[] = await broker.call('v1.product.getDocumentConfig', { productId }, opts);
-	const pf = allConfig.filter((e) => e.productId === productId && e.documentCode === documentCode);
+	let pf = allConfig.filter((e) => e.productId === productId && e.documentCode === documentCode);
 
+	pf = plainToClass(ProductDocument, pf);
 	expect(pf).toBeArrayOfTypeOfLength(ProductDocument, 0);
 });
 
@@ -122,8 +123,9 @@ test('product preference e2e', async () => {
 class ProductTestHelper {
 	static async validateProduct(p: Product) {
 		const allProducts: PagedResponse<Product> = await broker.call('v1.product.getProducts', {}, opts);
-		const pf = allProducts.items.filter((e) => e.code === p.code);
+		let pf = allProducts.items.filter((e) => e.code === p.code);
 
+		pf = plainToClass(Product, pf);
 		expect(pf).toBeArrayOfTypeOfLength(Product, 1);
 
 		expect(pf[0].id).toBeUuid();
@@ -138,8 +140,9 @@ class ProductTestHelper {
 	}
 	static async validateProductConfig(productId: string, key: string, value: any) {
 		const p: ProductConfig[] = await broker.call('v1.product.getConfig', { productId }, opts);
-		const pf = p.filter((e) => e.productId === productId && e.key === key);
+		let pf = p.filter((e) => e.productId === productId && e.key === key);
 
+		pf = plainToClass(ProductConfig, pf);
 		expect(pf).toBeArrayOfTypeOfLength(ProductConfig, 1);
 
 		expect(pf[0].id).toBeUuid();
@@ -157,8 +160,9 @@ class ProductTestHelper {
 
 	static async validateProductDocumentConfig(productId: string, documentCode: string, mandatory: boolean, description: string) {
 		const p: ProductDocument[] = await broker.call('v1.product.getDocumentConfig', { productId }, opts);
-		const pf = p.filter((e) => e.productId === productId && e.documentCode === documentCode);
+		let pf = p.filter((e) => e.productId === productId && e.documentCode === documentCode);
 
+		pf = plainToClass(ProductDocument, pf);
 		expect(pf).toBeArrayOfTypeOfLength(ProductDocument, 1);
 
 		expect(pf[0].id).toBeUuid();
@@ -167,8 +171,9 @@ class ProductTestHelper {
 	}
 
 	static async validateProductPreference(p: ProductPreference) {
-		const pf: ProductPreference = await broker.call('v1.product.getProductPreference', { productId: p.productId, type: p.type }, opts);
+		let pf: ProductPreference = await broker.call('v1.product.getProductPreference', { productId: p.productId, type: p.type }, opts);
 
+		pf = plainToClass(ProductPreference, pf);
 		expect(pf).toBeOfType(ProductPreference);
 
 		expect(pf.id).toBeUuid();

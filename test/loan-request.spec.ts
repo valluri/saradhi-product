@@ -1,11 +1,10 @@
 'use strict';
 
 import { LoanRequest } from '@Entities/loan-request';
-import LoanRequestService from '@MicroServices/loan-request.service';
 import { PagedResponse, Utility } from '@valluri/saradhi-library';
 import TestHelper from './helpers/helper';
 
-const broker = TestHelper.getBroker([LoanRequestService]);
+const broker = TestHelper.getBroker([]);
 let opts = {};
 
 beforeAll(async () => {

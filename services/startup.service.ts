@@ -21,19 +21,14 @@ import { Jlg } from '@Entities/loan-journey/jlg';
 	version: 1,
 })
 export default class StartupService extends ServiceBase {
-	private static DATA_SEEDING: string = 'isProductDataSeeding';
+	private static PRODUCT_DATA_SEEDING: string = 'isProductDataSeeding';
 
 	public async started() {
 		console.log(`Connecting to DB at ${process.env.TYPEORM_HOST}:${process.env.TYPEORM_PORT}`);
 
-		this.setEntitiesMethod();
-		await RepositoryBase.getDataSource();
-
-		if (Utility.getEnv('SEED_DATA', 'true') == 'true') {
-			this.broker.waitForServices(['v1.systemSetting']).then(async () => {
-				await this.triggerSeedMethod();
-			});
-		}
+		this.broker.waitForServices(['v1.systemSetting', 'v1.auth', 'v1.serviceLog', 'v1.connectionInfo']).then(async () => {
+			await this.seedMethod();
+		});
 	}
 
 	@Action({
@@ -42,7 +37,7 @@ export default class StartupService extends ServiceBase {
 		},
 	})
 	public async triggerSeed(ctx: Context) {
-		this.triggerSeedMethod();
+		this.seedMethod();
 	}
 
 	@Action({
@@ -58,46 +53,59 @@ export default class StartupService extends ServiceBase {
 		name: '$broker.stopped',
 	})
 	private async stop() {
-		await RepositoryBase.closeDataSource();
+		await RepositoryBase.closeDataSources();
+	}
+
+	@Event({
+		name: 'productSeeding.complete',
+	})
+	private async initConnections(ctx: Context) {
+		const connInfoList: any[] = await ctx.call('v1.connectionInfo.get');
+		await RepositoryBase.init(connInfoList, this.getPlatformEntitiesMethod(), this.getTenantEntitiesMethod());
 	}
 
 	@Method
-	private async triggerSeedMethod() {
+	private async seedMethod() {
+		if (Utility.getEnv('SEED_DATA', 'true') !== 'true') {
+			this.broker.emit('productSeeding.complete');
+			return;
+		}
+		const ctx: Context = this.broker.ContextFactory.create(this.broker);
+		(ctx.meta as any).tenantCode = '';
+
 		try {
 			// *check if seeding started
-			let setting: string | undefined | boolean = await this.broker.call('v1.systemSetting.get', { name: StartupService.DATA_SEEDING });
+
+			let setting: string | undefined | boolean = await ctx.call('v1.systemSetting.get', { name: StartupService.PRODUCT_DATA_SEEDING });
 			setting = setting && +setting ? true : false;
 
 			if (setting) {
-				this.broker.logger.info('test data seeding already started !');
+				ctx.broker.logger.info('test data seeding already started !');
 				return;
 			}
 
 			// *test data seed flag set to true
-			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '1' });
+			await ctx.call('v1.systemSetting.set', { name: StartupService.PRODUCT_DATA_SEEDING, value: '1' });
+			ctx.broker.logger.info('seed started');
 
-			this.broker.logger.info('seed started');
-
-			const ctx: Context = this.broker.ContextFactory.create(this.broker);
-
-			if (!Utility.isProduction()) {
-				await TestDataSeeder.seed(ctx);
-			}
-
-			await ConfigDataSeeder.seed(ctx);
+			// seed config data first
+			const connInfoList: any[] = await ctx.call('v1.connectionInfo.get');
+			await ConfigDataSeeder.seed(ctx, connInfoList, this.getPlatformEntitiesMethod(), this.getTenantEntitiesMethod());
+			await TestDataSeeder.seed(ctx);
 
 			// *test data seed flag reset to false for next time container start
-			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '0' });
-			this.broker.logger.info('seed completed');
+			await ctx.call('v1.systemSetting.set', { name: StartupService.PRODUCT_DATA_SEEDING, value: '0' });
+			ctx.broker.logger.info('seed completed');
 		} catch (err) {
 			console.log(err);
-			await this.broker.call('v1.systemSetting.set', { name: StartupService.DATA_SEEDING, value: '0' });
+			await ctx.call('v1.systemSetting.set', { name: StartupService.PRODUCT_DATA_SEEDING, value: '0' });
 		}
+		ctx.emit('productSeeding.complete');
 	}
 
 	@Method
-	private setEntitiesMethod() {
-		RepositoryBase.entities = [
+	private getTenantEntitiesMethod(): any[] {
+		return [
 			Address,
 			Partner,
 			PartnerContact,
@@ -112,6 +120,11 @@ export default class StartupService extends ServiceBase {
 			BusinessInfo,
 			Jlg,
 		];
+	}
+
+	@Method
+	private getPlatformEntitiesMethod(): any[] {
+		return [];
 	}
 }
 

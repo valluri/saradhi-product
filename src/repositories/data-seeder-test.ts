@@ -1,4 +1,4 @@
-import { RepositoryBase, DataSeederHelper, CtxMeta } from '@valluri/saradhi-library';
+import { RepositoryBase, DataSeederHelper, CtxMeta, Utility } from '@valluri/saradhi-library';
 import { Context } from 'moleculer';
 import { Partner } from '@Entities/partner/partner';
 import { ProductConfigKeys } from '@ServiceHelpers/product-config-keys';
@@ -9,7 +9,7 @@ export class TestDataSeeder extends RepositoryBase {
 	public static async seed(ctx: Context) {
 		ctx.broker.logger.info('test data seed started');
 
-		(ctx.meta as CtxMeta).tenantId = await DataSeederHelper.getDefaultTenantId(ctx);
+		(ctx.meta as CtxMeta).tenantCode = Utility.getEnv('DEFAULT_TENANT_CODE', 'subk');
 		await TestDataSeeder.seedPartners(ctx);
 
 		await TestDataSeeder.seedProducts(ctx);

@@ -2,11 +2,11 @@
 
 import { Partner } from '@Entities/partner/partner';
 import { PartnerContact } from '@Entities/partner/partner-contact';
-import PartnerService from '@MicroServices/partner.service';
 import { EntityStatusType, PagedResponse, Utility } from '@valluri/saradhi-library';
+import { plainToClass } from 'class-transformer';
 import TestHelper from './helpers/helper';
 
-const broker = TestHelper.getBroker([PartnerService]);
+const broker = TestHelper.getBroker([]);
 let opts = {};
 
 beforeAll(async () => {
@@ -36,12 +36,15 @@ test('partner e2e', async () => {
 
 	await broker.call('v1.partner.deletePartner', { id: savedpartner.id }, opts);
 	const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
-	const pf = allpartners.items.filter((e) => e.code === p.code);
+	let pf = allpartners.items.filter((e) => e.code === p.code);
+
+	pf = plainToClass(Partner, pf);
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
 
 test('partner contact e2e', async () => {
 	const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
+
 	const partnerId: string = allpartners.items[0].id!;
 
 	const p: PartnerContact = new PartnerContact();
@@ -64,8 +67,11 @@ test('partner contact e2e', async () => {
 	await PartnerTestHelper.validateContact(savedContact);
 
 	await broker.call('v1.partner.deleteContact', { id: savedContact.id }, opts);
-	const allContacts: PagedResponse<PartnerContact> = await broker.call('v1.partner.getContacts', { partnerId }, opts);
-	const pf = allContacts.items.filter((e) => e.id === p.id);
+	let allContacts: PagedResponse<PartnerContact> = await broker.call('v1.partner.getContacts', { partnerId }, opts);
+
+	allContacts.items = plainToClass(PartnerContact, allContacts.items);
+
+	let pf = allContacts.items.filter((e) => e.id === p.id);
 
 	expect(pf).toBeArrayOfTypeOfLength(Partner, 0);
 });
@@ -73,8 +79,9 @@ test('partner contact e2e', async () => {
 class PartnerTestHelper {
 	static async validatePartner(p: Partner) {
 		const allpartners: PagedResponse<Partner> = await broker.call('v1.partner.getPartners', {}, opts);
-		const pf = allpartners.items.filter((e) => e.code === p.code);
+		let pf = allpartners.items.filter((e) => e.code === p.code);
 
+		pf = plainToClass(Partner, pf);
 		expect(pf).toBeArrayOfTypeOfLength(Partner, 1);
 
 		expect(pf[0].id).toBeUuid();
@@ -84,8 +91,9 @@ class PartnerTestHelper {
 
 	static async validateContact(pc: PartnerContact) {
 		const allContacts: PagedResponse<PartnerContact> = await broker.call('v1.partner.getContacts', { partnerId: pc.partnerId }, opts);
-		const c = allContacts.items.filter((e) => e.email === pc.email);
+		let c = allContacts.items.filter((e) => e.email === pc.email);
 
+		c = plainToClass(PartnerContact, c);
 		expect(c).toBeArrayOfTypeOfLength(PartnerContact, 1);
 
 		expect(c[0].id).toBeUuid();

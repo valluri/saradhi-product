@@ -1,4 +1,4 @@
-import { BaseModel, ErrorHelper, RepositoryBase } from '@valluri/saradhi-library';
+import { RepositoryBase } from '@valluri/saradhi-library';
 import { Context } from 'moleculer';
 import { ProductConfig } from '@Entities/product/product-config';
 import { ProductDocument } from '@Entities/product/product-document';
