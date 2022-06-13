@@ -1,8 +1,8 @@
 import { Context } from 'moleculer';
-import { DataSeederHelper, RepositoryBase } from '@valluri/saradhi-library';
+import { ConnectionInfo, DataSeederHelper, RepositoryBase } from '@valluri/saradhi-library';
 
 export class ConfigDataSeeder extends RepositoryBase {
-	public static async seed(ctx: Context, connInfoList: any[], platformEntities: any[], tenantEntities: any[]) {
+	public static async seed(ctx: Context, connInfoList: ConnectionInfo[], platformEntities: any[], tenantEntities: any[]) {
 		ctx.broker.logger.info('++config seed');
 
 		await ConfigDataSeeder.seedAndCreateTenantDbs(ctx, connInfoList, tenantEntities);
@@ -28,7 +28,7 @@ export class ConfigDataSeeder extends RepositoryBase {
 		ctx.broker.logger.info('--config seed');
 	}
 
-	private static async seedAndCreateTenantDbs(ctx: Context, connInfoList: any[], tenantEntities: any[]) {
+	private static async seedAndCreateTenantDbs(ctx: Context, connInfoList: ConnectionInfo[], tenantEntities: any[]) {
 		for await (const t of connInfoList) {
 			await DataSeederHelper.createTenantDb(ctx, t, tenantEntities);
 		}

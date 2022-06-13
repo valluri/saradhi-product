@@ -1,4 +1,4 @@
-import { Address, RepositoryBase, ServiceBase, TokenRequiredType, Utility } from '@valluri/saradhi-library';
+import { Address, ConnectionInfo, RepositoryBase, ServiceBase, TokenRequiredType, Utility } from '@valluri/saradhi-library';
 import { Action, Event, Method, Service } from 'moleculer-decorators';
 import { Context } from 'moleculer';
 import { TestDataSeeder } from '@Repositories/data-seeder-test';
@@ -15,6 +15,7 @@ import { LoanRequest } from '@Entities/loan-request';
 import { PersonInfo } from '@Entities/person-info';
 import { BusinessInfo } from '@Entities/business-info';
 import { Jlg } from '@Entities/loan-journey/jlg';
+import { plainToClass } from 'class-transformer';
 
 @Service({
 	name: 'productStartup',
@@ -60,7 +61,9 @@ export default class StartupService extends ServiceBase {
 		name: 'productSeeding.complete',
 	})
 	private async initConnections(ctx: Context) {
-		const connInfoList: any[] = await ctx.call('v1.connectionInfo.get');
+		let connInfoList: ConnectionInfo[] = await ctx.call('v1.connectionInfo.get');
+		connInfoList = plainToClass(ConnectionInfo, connInfoList);
+
 		await RepositoryBase.init(connInfoList, this.getPlatformEntitiesMethod(), this.getTenantEntitiesMethod());
 	}
 
@@ -89,7 +92,8 @@ export default class StartupService extends ServiceBase {
 			ctx.broker.logger.info('seed started');
 
 			// seed config data first
-			const connInfoList: any[] = await ctx.call('v1.connectionInfo.get');
+			let connInfoList: ConnectionInfo[] = await ctx.call('v1.connectionInfo.get');
+			connInfoList = plainToClass(ConnectionInfo, connInfoList);
 			await ConfigDataSeeder.seed(ctx, connInfoList, this.getPlatformEntitiesMethod(), this.getTenantEntitiesMethod());
 			await TestDataSeeder.seed(ctx);
 
