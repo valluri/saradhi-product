@@ -43,7 +43,9 @@ export default class ProductService extends ServiceBase {
 		code: { type: 'string', min: 2, max: 100 },
 	};
 
-	@Action()
+	@Action({
+		...ProductService.productManageSecurity,
+	})
 	public async getProducts(ctx: Context): Promise<PagedResponse<Product>> {
 		const products: PagedResponse<Product> = await ProductRepository.getPagedResources(ctx, Product, { where: {} });
 
