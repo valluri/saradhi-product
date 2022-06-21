@@ -19,7 +19,7 @@ export default class PartnerService extends ServiceBase {
 		partnerId: { type: 'string' },
 		name: { type: 'string' },
 		designation: { type: 'string' },
-		email: { type: 'email', optional: true },
+		email: { type: 'string', optional: true },
 		mobile: { type: 'string', optional: true },
 	};
 
