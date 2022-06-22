@@ -106,7 +106,7 @@ export default class PartnerService extends ServiceBase {
 		},
 	})
 	public async insertContact(ctx: Context<PartnerContact>): Promise<PartnerContact> {
-		const returnValue = await PartnerRepository.insertResource(ctx, PartnerContact, { partnerId: ctx.params.partnerId, email: ctx.params.email });
+		const returnValue = (await PartnerRepository.saveResources(ctx, PartnerContact, ctx.params)) as PartnerContact;
 		return await this.enrich(ctx, returnValue);
 	}
 
