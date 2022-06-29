@@ -7,15 +7,28 @@
 // 	private static PARAM_PAGED_RESPONSE = 'paged';
 // 	private static PARAM_NORMAL = 'normal';
 
-// 	public static async enrich<T>(ctx: Context, entities: T, enrichmentFields: string[], actionToFetchData: string): Promise<T>;
+// 	public static async enrich<T>(
+// 		ctx: Context,
+// 		entities: T,
+// 		enrichmentFields: string[],
+// 		actionToFetchData: string,
+// 		enrichingUserInfo: boolean,
+// 	): Promise<T>;
 
-// 	public static async enrich<T>(ctx: Context, entities: T[], enrichmentFields: string[], actionToFetchData: string): Promise<T[]>;
+// 	public static async enrich<T>(
+// 		ctx: Context,
+// 		entities: T[],
+// 		enrichmentFields: string[],
+// 		actionToFetchData: string,
+// 		enrichingUserInfo: boolean,
+// 	): Promise<T[]>;
 
 // 	public static async enrich<T>(
 // 		ctx: Context,
 // 		entities: PagedResponse<T>,
 // 		enrichmentFields: string[],
 // 		actionToFetchData: string,
+// 		enrichingUserInfo: boolean,
 // 	): Promise<PagedResponse<T>>;
 
 // 	public static async enrich<T>(
@@ -23,9 +36,12 @@
 // 		entities: T | T[] | PagedResponse<T>,
 // 		enrichmentFields: string[],
 // 		actionToFetchData: string,
+// 		enrichingUserInfo: boolean,
 // 	): Promise<T | T[] | PagedResponse<T>> {
-// 		enrichmentFields.push(Constants.CREATED_BY);
-// 		enrichmentFields.push(Constants.MODIFIED_BY);
+// 		if (enrichingUserInfo) {
+// 			enrichmentFields.push(Constants.CREATED_BY);
+// 			enrichmentFields.push(Constants.MODIFIED_BY);
+// 		}
 
 // 		const paramType: string = EnrichmentHelper.getParamType(entities);
 

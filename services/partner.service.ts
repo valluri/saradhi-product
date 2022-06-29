@@ -166,7 +166,7 @@ export default class PartnerService extends ServiceBase {
 		ctx: Context,
 		data: Partner | PagedResponse<Partner> | PartnerContact | PagedResponse<PartnerContact>,
 	): Promise<Partner | PagedResponse<Partner> | PartnerContact | PagedResponse<PartnerContact>> {
-		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds');
+		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds', true);
 	}
 }
 

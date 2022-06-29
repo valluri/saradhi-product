@@ -316,8 +316,8 @@ export default class ProductService extends ServiceBase {
 
 	@Method
 	private async enrich(ctx: Context, data: Product | PagedResponse<Product>): Promise<Product | PagedResponse<Product>> {
-		data = await EnrichmentHelper.enrich(ctx, data, ['partnerId'], 'v1.partner.getForEnrichment');
-		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds');
+		data = await EnrichmentHelper.enrich(ctx, data, ['partnerId'], 'v1.partner.getForEnrichment', false);
+		return await EnrichmentHelper.enrich(ctx, data, [], 'v1.userList.getLiteUsingIds', true);
 	}
 }
 
