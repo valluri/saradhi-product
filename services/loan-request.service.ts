@@ -1,10 +1,8 @@
 import { Context } from 'moleculer';
 import { Action, Service } from 'moleculer-decorators';
-import { ServiceBase, UserReportee } from '@valluri/saradhi-library';
 import { LoanRequest } from '@Entities/loan-request';
 import { LoanRequestRepository } from '@Repositories/loan-request-repository';
-import { In } from 'typeorm';
-import { RightsEnum, Constants, PagedRequest, PagedResponse, Utility } from '@valluri/saradhi-library';
+import { ServiceBase, RightsEnum, Constants, PagedRequest, PagedResponse, Utility } from '@valluri/saradhi-library';
 
 @Service({
 	name: 'loanRequest',
