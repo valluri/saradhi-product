@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import * as Moleculer from 'moleculer';
 import MoleculerRetryableError = Moleculer.Errors.MoleculerRetryableError;
 const SarthiTracer = require('@valluri/saradhi-library/dist/src/service-helpers/service-trace-helper');
+const ChannelsMiddleware = require('@moleculer/channels').Middleware;
 
 /**
  * Moleculer ServiceBroker configuration file
@@ -180,7 +181,11 @@ const brokerConfig: BrokerOptions = {
 	hotReload: false,
 
 	// Register custom middlewares
-	middlewares: [],
+	middlewares: [
+		ChannelsMiddleware({
+			adapter: process.env.CHANNELS_MIDDLEWARE_ADAPTER,
+		}),
+	],
 
 	// Called after broker created.
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
